@@ -7,6 +7,7 @@ import 'package:octane_pro/CustomWidgets/CustomInputField.dart';
 import 'package:octane_pro/GetxControllers/Sale-Controller/SaleSummaryController.dart';
 import 'package:octane_pro/untils/assetImages.dart';
 import 'package:octane_pro/untils/utils.dart';
+import 'dart:math' as math;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,6 +15,7 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
+
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
@@ -22,7 +24,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // New Animation for Sale Summary
   late AnimationController _summaryController;
   late Animation<double> _scaleAnimation;
-  final SaleSummaryController saleSummaryController = Get.put(SaleSummaryController());
+  final SaleSummaryController saleSummaryController =
+      Get.put(SaleSummaryController());
   @override
   void initState() {
     super.initState();
@@ -32,7 +35,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       vsync: this,
     );
 
-    _opacityAnimation = Tween<double>(begin: 0.1, end: 1.0).animate(_controller);
+    _opacityAnimation =
+        Tween<double>(begin: 0.1, end: 1.0).animate(_controller);
     _slideAnimation = Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
         .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
@@ -57,6 +61,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _summaryController.dispose();
     super.dispose();
   }
+
   List<Map<String, dynamic>> fuelData = [
     {"type": "Petrol", "liter": 2200, "price": 1234567},
     {"type": "Diesel", "liter": 1500, "price": 1234567},
@@ -78,12 +83,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // Format price function
   // Format price function
   String formatPrice(double price) {
-    final formatter = NumberFormat('#,##0'); // Adjust this format pattern if you want decimals
+    final formatter = NumberFormat(
+        '#,##0'); // Adjust this format pattern if you want decimals
     return formatter.format(price);
   }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: AppColors.darkBlack,
       body: SafeArea(
@@ -96,9 +102,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: [
                 Center(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16.0.h, horizontal: 16.0.w),
+                    padding: EdgeInsets.symmetric(
+                        vertical: 16.0.h, horizontal: 16.0.w),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         SvgPicture.asset(
                           AppIcons.drawer,
@@ -122,10 +129,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       } else if (snapshot.hasError) {
                         return Center(child: Text('Error: ${snapshot.error}'));
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Center(child: Text('No sales data available.'));
+                        return Center(child: Text('No sales data available.',style: TextStyle(color: Colors.white),));
                       }
 
-                      final List<Map<String, dynamic>> fuelData = snapshot.data!;
+                      final List<Map<String, dynamic>> fuelData =
+                          snapshot.data!;
 
                       // Initialize totals for petrol, diesel, and hobc
                       double petrolTotalLiters = 0.0;
@@ -138,8 +146,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       // Calculate totals
                       for (var fuel in fuelData) {
                         String type = fuel['type'] as String; // Cast to String
-                        double liters = (fuel['liter'] as num?)?.toDouble() ?? 0.0; // Cast to double
-                        double price = (fuel['price'] as num?)?.toDouble() ?? 0.0; // Cast to double
+                        double liters = (fuel['liter'] as num?)?.toDouble() ??
+                            0.0; // Cast to double
+                        double price = (fuel['price'] as num?)?.toDouble() ??
+                            0.0; // Cast to double
 
                         if (type == 'Petrol') {
                           petrolTotalLiters += liters;
@@ -155,9 +165,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
                       // Create a list to display
                       final totals = [
-                        {'type': 'Petrol', 'liters': petrolTotalLiters, 'price': petrolTotalPrice},
-                        {'type': 'Diesel', 'liters': dieselTotalLiters, 'price': dieselTotalPrice},
-                        {'type': 'Hobc', 'liters': hobcTotalLiters, 'price': hobcTotalPrice},
+                        {
+                          'type': 'Petrol',
+                          'liters': petrolTotalLiters,
+                          'price': petrolTotalPrice
+                        },
+                        {
+                          'type': 'Diesel',
+                          'liters': dieselTotalLiters,
+                          'price': dieselTotalPrice
+                        },
+                        {
+                          'type': 'Hobc',
+                          'liters': hobcTotalLiters,
+                          'price': hobcTotalPrice
+                        },
                       ];
 
                       return Container(
@@ -193,7 +215,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       Expanded(
                                         flex: 2,
                                         child: Text(
-                                          fuel['type'] as String, // Cast to String
+                                          fuel['type']
+                                              as String, // Cast to String
                                           textAlign: TextAlign.center,
                                           style: AppColors.small.copyWith(
                                             fontSize: 16.sp,
@@ -216,17 +239,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             TextSpan(
                                               children: [
                                                 TextSpan(
-                                                  text: "${fuel['liters']}", // Show liters
-                                                  style: AppColors.subtitleStyle.copyWith(
+                                                  text:
+                                                      "${fuel['liters']}", // Show liters
+                                                  style: AppColors.subtitleStyle
+                                                      .copyWith(
                                                     fontSize: 20.sp,
-                                                    color: AppColors.primaryTextColor,
+                                                    color: AppColors
+                                                        .primaryTextColor,
                                                   ),
                                                 ),
                                                 TextSpan(
                                                   text: " ltr",
-                                                  style: AppColors.subtitleStyle.copyWith(
+                                                  style: AppColors.subtitleStyle
+                                                      .copyWith(
                                                     fontSize: 10.sp,
-                                                    color: AppColors.primaryTextColor,
+                                                    color: AppColors
+                                                        .primaryTextColor,
                                                   ),
                                                 ),
                                               ],
@@ -250,17 +278,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             TextSpan(
                                               children: [
                                                 TextSpan(
-                                                  text: formatPrice(fuel['price'] as double), // Cast to double
-                                                  style: AppColors.headingStyle.copyWith(
+                                                  text: formatPrice(fuel[
+                                                          'price']
+                                                      as double), // Cast to double
+                                                  style: AppColors.headingStyle
+                                                      .copyWith(
                                                     fontSize: 16.sp,
-                                                    color: AppColors.primaryTextColor,
+                                                    color: AppColors
+                                                        .primaryTextColor,
                                                   ),
                                                 ),
                                                 TextSpan(
                                                   text: " rs.",
-                                                  style: AppColors.small.copyWith(
+                                                  style:
+                                                      AppColors.small.copyWith(
                                                     fontSize: 10.sp,
-                                                    color: AppColors.primaryTextColor,
+                                                    color: AppColors
+                                                        .primaryTextColor,
                                                   ),
                                                 ),
                                               ],
@@ -287,28 +321,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Center(
                   child: Text(
                     "Stock",
-                    style: AppColors.headingStyle.copyWith(fontSize: 20.sp, color: Colors.red),
+                    style: AppColors.headingStyle
+                        .copyWith(fontSize: 20.sp, color: Colors.red),
                   ),
                 ),
-                SizedBox(height: 5.h),
-                Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: fuelStockData.map((fuel) {
-                      return Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                          child: MyCircularContainer(
-                            progressValue: fuel["progress"]?.toDouble() ?? 0.0,
-                            petrolLiter: fuel["liter"]?.toInt() ?? 0,
-                            petrolPrice: fuel["price"]?.toDouble() ?? 0.0,
-                            fuelType: fuel["type"] ?? '',
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
+                SizedBox(height: 8.h),
+                FuelDashboard(),
+                // Center(
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     children: fuelStockData.map((fuel) {
+                //       return Expanded(
+                //         child: Padding(
+                //           padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                //           child: MyCircularContainer(
+                //             progressValue: fuel["progress"]?.toDouble() ?? 0.0,
+                //             petrolLiter: fuel["liter"]?.toInt() ?? 0,
+                //             petrolPrice: fuel["price"]?.toDouble() ?? 0.0,
+                //             fuelType: fuel["type"] ?? '',
+                //           ),
+                //         ),
+                //       );
+                //     }).toList(),
+                //   ),
+                // ),
 
                 SizedBox(height: 31.h),
 
@@ -351,10 +387,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Image.asset(
                                           item["image"]!,
@@ -376,13 +414,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       width: 118.w,
                                       height: 45.h,
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        color: Colors.red
-                                      ),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          color: Colors.red),
                                       child: Center(
                                         child: Text(
                                           item["count"]!,
-                                          style: AppColors.headingStyle.copyWith(
+                                          style:
+                                              AppColors.headingStyle.copyWith(
                                             fontSize: 22.sp,
                                             color: AppColors.primaryTextColor,
                                           ),
@@ -408,91 +447,327 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 }
 
+class AnimatedFuelWidget extends StatefulWidget {
+  final double totalLiters;
+  final double remainingLiters;
 
-class MyCircularContainer extends StatelessWidget {
-  final double progressValue; // Example progress value
-  final int petrolLiter; // Example petrol liter
-  final double petrolPrice; // Example petrol price
-  final String fuelType; // Fuel type
+  const AnimatedFuelWidget({
+    Key? key,
+    required this.totalLiters,
+    required this.remainingLiters,
+  }) : super(key: key);
 
-  MyCircularContainer({
-    required this.progressValue,
-    required this.petrolLiter,
-    required this.petrolPrice,
-    required this.fuelType,
-  });
+  @override
+  _AnimatedFuelWidgetState createState() => _AnimatedFuelWidgetState();
+}
+
+class _AnimatedFuelWidgetState extends State<AnimatedFuelWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize the animation controller
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(); // Repeats the animation continuously
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose(); // Dispose the controller when not needed
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: Get.width,
-      child: Center(
-        child: Container(
-          width: 150.w,
-          height: 150.h,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color.fromRGBO(42, 42, 42, 1),
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return CustomPaint(
+          size: Size(110, 110), // Customize the size552
+          painter: FuelPainter(
+            totalLiters: widget.totalLiters,
+            remainingLiters: widget.remainingLiters,
+            animationValue: _animationController.value,
           ),
-          child: Center(
-            child: Container(
-              width: 120.w,
-              height: 120.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color.fromRGBO(55, 55, 55, 1),
-              ),
-              child: Center(
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            fuelType,
-                            style: AppColors.headingStyle.copyWith(
-                              color: Colors.white,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                          Text(
-                            "$petrolLiter ltr",
-                            style: AppColors.subtitleStyle.copyWith(
-                              color: Colors.white,
-                              fontSize: 12.sp,
-                            ),
-                          ),
-                          Text(
-                            "${petrolPrice.toStringAsFixed(2)} rs",
-                            style: AppColors.small.copyWith(
-                              color: Colors.white,
-                              fontSize: 10.sp,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Center(
-                      child: Container(
-                        width: 84.w,
-                        height: 84.w,
-                        child: CircularProgressIndicator(
-                          value: progressValue.isNaN ? 0.0 : progressValue, // Prevent NaN
-                          backgroundColor: Colors.transparent,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                          strokeWidth: 4,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
+class FuelPainter extends CustomPainter {
+  final double totalLiters;
+  final double remainingLiters;
+  final double animationValue;
+
+  FuelPainter({
+    required this.totalLiters,
+    required this.remainingLiters,
+    required this.animationValue,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Calculate the percentage of remaining liters
+    double percentage = remainingLiters / totalLiters;
+
+    // Outer circle color
+    Paint circlePaint = Paint()
+      ..color = Color(0xff2A2A2A)
+      ..style = PaintingStyle.fill;
+
+    // Inner red fill color
+    Paint fillPaint = Paint()
+      ..color = Color(0xffFF3F3E)
+      ..style = PaintingStyle.fill;
+
+    // Circle border color
+    Paint borderPaint = Paint()
+      ..color =Color(0xff2A2A2A)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+
+    // Pinkish wave stroke color
+    Paint waveStrokePaint = Paint()
+      ..color = Color(0xffFF6B6A)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6;
+
+    // Create a circular path for clipping
+    Path circlePath = Path();
+    circlePath.addOval(Rect.fromCircle(
+        center: size.center(Offset.zero), radius: size.width / 2));
+
+    // Clip the canvas to the circular region
+    canvas.save();
+    canvas.clipPath(circlePath);
+
+    // Draw outer circle
+    canvas.drawCircle(size.center(Offset.zero), size.width / 2, circlePaint);
+
+    // Calculate the height of the wave
+    double waveHeight = size.height * (1 - percentage);
+
+    // Create the wave path
+    Path wavePath = Path();
+    wavePath.moveTo(0, waveHeight);
+
+    // Define wave properties with animation
+    double waveAmplitude = 5; // Fixed amplitude
+    double waveFrequency = 4; // Fixed frequency
+
+    for (double i = 0; i <= size.width; i++) {
+      // Create a sine wave shape along the x-axis, shifting the wave based on animationValue
+      wavePath.lineTo(
+        i,
+        waveHeight + waveAmplitude * math.sin((i / size.width) * waveFrequency * math.pi + animationValue * 2 * math.pi),
+      );
+    }
+
+    // Draw the wave-shaped red fill
+    wavePath.lineTo(size.width, size.height);
+    wavePath.lineTo(0, size.height);
+    wavePath.close();
+
+    canvas.drawPath(wavePath, fillPaint);
+
+    // Restore the canvas to remove the clipping for further drawing
+    canvas.restore();
+
+    // Clip the wave stroke to remain within the circle
+    canvas.save();
+    canvas.clipPath(circlePath);
+
+    // Draw the pinkish stroke for the wave border (inside the circle clipping)
+    canvas.drawPath(wavePath, waveStrokePaint);
+
+    // Restore after stroke is drawn
+    canvas.restore();
+
+    // Draw the outer circle border
+    canvas.drawCircle(size.center(Offset.zero), size.width / 2, borderPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true; // Always repaint when animation is changing
+  }
+}
+
+class FuelWidget extends StatelessWidget {
+  final String fuelType;
+  final double totalLiters;
+  final double remainingLiters;
+  final String price;
+
+  FuelWidget({
+    required this.fuelType,
+    required this.totalLiters,
+    required this.remainingLiters,
+    required this.price,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            AnimatedFuelWidget(
+                totalLiters: totalLiters, remainingLiters: remainingLiters),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  fuelType,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  "${remainingLiters.toStringAsFixed(0)}ltr",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  price,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class FuelDashboard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        FuelWidget(
+          fuelType: 'Petrol',
+          totalLiters: 15000,
+          remainingLiters: 12000,
+          price: '1,234,567rs',
+        ),
+        FuelWidget(
+          fuelType: 'Diesel',
+          totalLiters: 15000,
+          remainingLiters: 2200,
+          price: '1,234,567rs',
+        ),
+        FuelWidget(
+          fuelType: 'HOBC',
+          totalLiters: 15000,
+          remainingLiters: 10200,
+          price: '1,234,567rs',
+        ),
+      ],
+    );
+  }
+}
+// class MyCircularContainer extends StatelessWidget {
+//   final double progressValue; // Example progress value
+//   final int petrolLiter; // Example petrol liter
+//   final double petrolPrice; // Example petrol price
+//   final String fuelType; // Fuel type
+//
+//   MyCircularContainer({
+//     required this.progressValue,
+//     required this.petrolLiter,
+//     required this.petrolPrice,
+//     required this.fuelType,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       width: Get.width,
+//       child: Center(
+//         child: Container(
+//           width: 150.w,
+//           height: 150.h,
+//           decoration: BoxDecoration(
+//             shape: BoxShape.circle,
+//             color: Color.fromRGBO(42, 42, 42, 1),
+//           ),
+//           child: Center(
+//             child: Container(
+//               width: 120.w,
+//               height: 120.h,
+//               decoration: BoxDecoration(
+//                 shape: BoxShape.circle,
+//                 color: Color.fromRGBO(55, 55, 55, 1),
+//               ),
+//               child: Center(
+//                 child: Stack(
+//                   children: [
+//                     Center(
+//                       child: Column(
+//                         mainAxisAlignment: MainAxisAlignment.center,
+//                         children: [
+//                           Text(
+//                             fuelType,
+//                             style: AppColors.headingStyle.copyWith(
+//                               color: Colors.white,
+//                               fontSize: 14.sp,
+//                             ),
+//                           ),
+//                           Text(
+//                             "$petrolLiter ltr",
+//                             style: AppColors.subtitleStyle.copyWith(
+//                               color: Colors.white,
+//                               fontSize: 12.sp,
+//                             ),
+//                           ),
+//                           Text(
+//                             "${petrolPrice.toStringAsFixed(2)} rs",
+//                             style: AppColors.small.copyWith(
+//                               color: Colors.white,
+//                               fontSize: 10.sp,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                     Center(
+//                       child: Container(
+//                         width: 84.w,
+//                         height: 84.w,
+//                         child: CircularProgressIndicator(
+//                           value: progressValue.isNaN ? 0.0 : progressValue, // Prevent NaN
+//                           backgroundColor: Colors.transparent,
+//                           valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+//                           strokeWidth: 4,
+//                         ),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

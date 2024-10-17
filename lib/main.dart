@@ -11,7 +11,7 @@ import 'Screens/Auth/login_page.dart';
 import 'Screens/Auth/splash_screen.dart';
 import 'Screens/HomePage/home_Page.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Initialize Firebase here
   Get.put(Authcontroller());
@@ -34,13 +34,11 @@ class MyApp extends StatelessWidget {
       designSize: const Size(375, 812), // Ensure design size fits your UI
       child: GetMaterialApp(
         title: 'Octane Pro',
-        debugShowCheckedModeBanner: false
-        ,
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
-
           useMaterial3: true,
         ),
-        home:  SplashScreen(),
+        home: SplashScreen(),
       ),
     );
   }

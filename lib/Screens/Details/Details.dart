@@ -72,6 +72,7 @@ class _DetailsScreenState extends State<DetailsScreen>
     super.dispose();
   }
 
+  bool isGridView = true;
   List<List<String>> fuels = [
     ['Petrol', '1,234,567', '2200'],
     ['Diesel', '1,000,000', '1500'],
@@ -80,6 +81,22 @@ class _DetailsScreenState extends State<DetailsScreen>
   final DataController dataController = Get.put(DataController());
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> fuelData = [
+      {
+        'fuelType': 'Petrol',
+        'price': 248.99,
+        'sale': 12000.00,
+        'liters': 18.00
+      },
+      {
+        'fuelType': 'Diesel',
+        'price': 248.99,
+        'sale': 12000.00,
+        'liters': 18.00
+      },
+      {'fuelType': 'CNG', 'price': 45.99, 'sale': 5000.00, 'liters': 15.00},
+      {'fuelType': 'LPG', 'price': 65.99, 'sale': 7000.00, 'liters': 10.00},
+    ];
     return Scaffold(
       backgroundColor: AppColors.darkBlack,
       body: SafeArea(
@@ -90,8 +107,14 @@ class _DetailsScreenState extends State<DetailsScreen>
                 padding:
                     EdgeInsets.symmetric(vertical: 16.0.h, horizontal: 16.0.w),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    SvgPicture.asset(
+                      AppIcons.drawer,
+                      height: 30.h,
+                      width: 30.w,
+                      fit: BoxFit.fill,
+                    ),
                     SvgPicture.asset(
                       AppIcons.filter,
                       height: 30.h,
@@ -199,616 +222,405 @@ class _DetailsScreenState extends State<DetailsScreen>
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    // Daily Graph
-                    // SingleChildScrollView(
-                    //   child: Column(
-                    //     children: [
-                    //       ElevatedButton(
-                    //           onPressed: () {
-                    //             List<int> data = [
-                    //               0,
-                    //               1,
-                    //               21,
-                    //               123,
-                    //               1267835
-                    //             ]; // Your data
-                    //             dataController.sendDataAsString(data);
-                    //           },
-                    //           child: Text('Send Data')),
-                    //
-                    //       Container(
-                    //         width: 162.w,
-                    //         height: 181.h,
-                    //         decoration: BoxDecoration(
-                    //           borderRadius: BorderRadius.circular(20),
-                    //           color: Color.fromRGBO(34, 34, 34, 1),
-                    //         ),
-                    //         child: Column(
-                    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //           children: [
-                    //             // Petrol Text
-                    //             Container(
-                    //               width: Get.width * 0.3,
-                    //               child: Row(
-                    //                 mainAxisAlignment:
-                    //                     MainAxisAlignment.spaceEvenly,
-                    //                 children: [
-                    //                   Row(
-                    //                     mainAxisAlignment:
-                    //                         MainAxisAlignment.center,
-                    //                     crossAxisAlignment:
-                    //                         CrossAxisAlignment.center,
-                    //                     children: [
-                    //                       Image.asset(
-                    //                         AppImages.petrol,
-                    //                         width: 25.w,
-                    //                         height: 28.h,
-                    //                       ),
-                    //                       Text(
-                    //                         '1',
-                    //                         style: AppColors.subtitleStyle
-                    //                             .copyWith(
-                    //                                 fontSize: 20.sp,
-                    //                                 color: Colors.red),
-                    //                       )
-                    //                     ],
-                    //                   ),
-                    //                   Text(
-                    //                     "Petrol",
-                    //                     style: AppColors.subtitleStyle.copyWith(
-                    //                         fontSize: 20.sp, color: Colors.red),
-                    //                   )
-                    //                 ],
-                    //               ),
-                    //             ),
-                    //
-                    //             // first Row
-                    //             Container(
-                    //               width: 162.w,
-                    //               height: 45.h,
-                    //               decoration: BoxDecoration(
-                    //                   color: Colors.red,
-                    //                   borderRadius: BorderRadius.only(
-                    //                     topLeft: Radius.circular(20),
-                    //                     topRight: Radius.circular(20),
-                    //                   )),
-                    //               child: Row(
-                    //                 mainAxisAlignment:
-                    //                     MainAxisAlignment.spaceBetween,
-                    //                 children: [
-                    //                   Container(
-                    //                     width: 48.w,
-                    //                     height: 45.h,
-                    //                     decoration: BoxDecoration(
-                    //                         color:
-                    //                             Color.fromRGBO(38, 144, 234, 1),
-                    //                         borderRadius: BorderRadius.only(
-                    //                             topLeft: Radius.circular(20))),
-                    //                     // color: Color.fromRGBO(38, 144, 234, 1),
-                    //                     child: Center(
-                    //                       child: Text(
-                    //                         "Price",
-                    //                         style: AppColors.small.copyWith(
-                    //                             fontSize: 14.sp,
-                    //                             color:
-                    //                                 AppColors.primaryTextColor),
-                    //                       ),
-                    //                     ),
-                    //                   ),
-                    //                   Container(
-                    //                     width: 114.w,
-                    //                     height: 45.h,
-                    //                     decoration: BoxDecoration(
-                    //                         color: Colors.red,
-                    //                         borderRadius: BorderRadius.only(
-                    //                             topRight: Radius.circular(20))),
-                    //                     // color: Color.fromRGBO(38, 144, 234, 1),
-                    //                     child: Center(
-                    //                       child: Text(
-                    //                         "248.99",
-                    //                         style: AppColors.subtitleStyle
-                    //                             .copyWith(
-                    //                                 fontSize: 22.sp,
-                    //                                 color: AppColors
-                    //                                     .primaryTextColor),
-                    //                       ),
-                    //                     ),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //             ),
-                    //
-                    //             // Scnd
-                    //             Container(
-                    //               width: 162.w,
-                    //               height: 45.h,
-                    //               decoration: BoxDecoration(
-                    //                 color: Colors.red,
-                    //               ),
-                    //               child: Row(
-                    //                 mainAxisAlignment:
-                    //                     MainAxisAlignment.spaceBetween,
-                    //                 children: [
-                    //                   Container(
-                    //                     width: 48.w,
-                    //                     height: 45.h,
-                    //                     decoration: BoxDecoration(
-                    //                       color:
-                    //                           Color.fromRGBO(38, 144, 234, 1),
-                    //                     ),
-                    //                     // color: Color.fromRGBO(38, 144, 234, 1),
-                    //                     child: Center(
-                    //                       child: Text(
-                    //                         "Sale",
-                    //                         style: AppColors.small.copyWith(
-                    //                             fontSize: 14.sp,
-                    //                             color:
-                    //                                 AppColors.primaryTextColor),
-                    //                       ),
-                    //                     ),
-                    //                   ),
-                    //                   Container(
-                    //                     width: 114.w,
-                    //                     height: 45.h,
-                    //                     decoration: BoxDecoration(
-                    //                       color: Colors.red,
-                    //                     ),
-                    //                     // color: Color.fromRGBO(38, 144, 234, 1),
-                    //                     child: Center(
-                    //                       child: Text(
-                    //                         "12,049",
-                    //                         style: AppColors.subtitleStyle
-                    //                             .copyWith(
-                    //                                 fontSize: 22.sp,
-                    //                                 color: AppColors
-                    //                                     .primaryTextColor),
-                    //                       ),
-                    //                     ),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //             ),
-                    //
-                    //             // 3rd
-                    //             Container(
-                    //               width: 162.w,
-                    //               height: 45.h,
-                    //               decoration: BoxDecoration(
-                    //                   color: Colors.red,
-                    //                   borderRadius: BorderRadius.only(
-                    //                     bottomLeft: Radius.circular(20),
-                    //                     bottomRight: Radius.circular(20),
-                    //                   )),
-                    //               child: Row(
-                    //                 mainAxisAlignment:
-                    //                     MainAxisAlignment.spaceBetween,
-                    //                 children: [
-                    //                   Container(
-                    //                     width: 48.w,
-                    //                     height: 45.h,
-                    //                     decoration: BoxDecoration(
-                    //                         color:
-                    //                             Color.fromRGBO(38, 144, 234, 1),
-                    //                         borderRadius: BorderRadius.only(
-                    //                             bottomLeft:
-                    //                                 Radius.circular(20))),
-                    //                     // color: Color.fromRGBO(38, 144, 234, 1),
-                    //                     child: Center(
-                    //                       child: Text(
-                    //                         "Ltr",
-                    //                         style: AppColors.small.copyWith(
-                    //                             fontSize: 14.sp,
-                    //                             color:
-                    //                                 AppColors.primaryTextColor),
-                    //                       ),
-                    //                     ),
-                    //                   ),
-                    //                   Container(
-                    //                     width: 114.w,
-                    //                     height: 45.h,
-                    //                     decoration: BoxDecoration(
-                    //                         color: Colors.red,
-                    //                         borderRadius: BorderRadius.only(
-                    //                             bottomRight:
-                    //                                 Radius.circular(20))),
-                    //                     // color: Color.fromRGBO(38, 144, 234, 1),
-                    //                     child: Center(
-                    //                       child: Text(
-                    //                         "18.99",
-                    //                         style: AppColors.subtitleStyle
-                    //                             .copyWith(
-                    //                                 fontSize: 22.sp,
-                    //                                 color: AppColors
-                    //                                     .primaryTextColor),
-                    //                       ),
-                    //                     ),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       )
-                    //     ],
-                    //   ),
-                    // ),
-
-                    // Weekly Graph
                     SingleChildScrollView(
                       child: Column(
                         children: [
-                          SizedBox(height: 22.h),
-                          ...fuels.map((fuel) {
-                            return Container(
-                              width: 327.w,
-                              height: 158.h,
-                              margin: const EdgeInsets.only(
-                                  bottom: 10), // 10 pixels bottom margin
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(34, 34, 34, 1),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(width: 1),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  isGridView ? Icons.list : Icons.grid_view,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    isGridView =
+                                        !isGridView; // Toggle the boolean value
+                                  });
+                                },
                               ),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 8.0),
-                                        child: Text(
-                                          fuel[0], // Fuel name
-                                          style:
-                                              AppColors.headingStyle.copyWith(
-                                            fontSize: 20.sp,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColors.primaryTextColor,
-                                          ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: isGridView
+                                ? GridView.builder(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      mainAxisExtent: 133,
+                                      crossAxisCount: 2, // 2 cards per row
+                                      crossAxisSpacing: 14,
+                                      mainAxisSpacing: 16,
+                                      // childAspectRatio: 1.2, // Adjust the aspect ratio
+                                    ),
+                                    itemCount: fuelData.length,
+                                    itemBuilder: (context, index) {
+                                      return FuelCard(
+                                        fuelType: fuelData[index]['fuelType'],
+                                        price: fuelData[index]['price'],
+                                        sale: fuelData[index]['sale'],
+                                        liters: fuelData[index]['liters'],
+                                      );
+                                    },
+                                  )
+                                : ListView.builder(
+                                    // padding: EdgeInsets.symmetric(vertical: ),
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: fuelData.length,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                        child: FuelCard(
+                                          fuelType: fuelData[index]['fuelType'],
+                                          price: fuelData[index]['price'],
+                                          sale: fuelData[index]['sale'],
+                                          liters: fuelData[index]['liters'],
                                         ),
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.all(4.5),
-                                        width: 200.w,
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(20),
-                                            bottomLeft: Radius.circular(20),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            RichText(
-                                              text: TextSpan(
-                                                children: [
-                                                  TextSpan(
-                                                    text: fuel[1], // Price
-                                                    style: AppColors
-                                                        .subtitleStyle
-                                                        .copyWith(
-                                                      color: AppColors
-                                                          .primaryTextColor,
-                                                      fontSize: 16.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: ' rs',
-                                                    style: AppColors
-                                                        .subtitleStyle
-                                                        .copyWith(
-                                                      color: AppColors
-                                                          .primaryTextColor,
-                                                      fontSize: 10.sp,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(width: 10.w),
-                                            RichText(
-                                              text: TextSpan(
-                                                children: [
-                                                  TextSpan(
-                                                    text: fuel[2], // Quantity
-                                                    style: AppColors
-                                                        .subtitleStyle
-                                                        .copyWith(
-                                                      color: AppColors
-                                                          .primaryTextColor,
-                                                      fontSize: 20.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: ' ltr',
-                                                    style: AppColors
-                                                        .subtitleStyle
-                                                        .copyWith(
-                                                      color: AppColors
-                                                          .primaryTextColor,
-                                                      fontSize: 10.sp,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                      );
+                                    },
                                   ),
-                                  Center(
-                                      child:
-                                          const CustomLineChartWeek()), // Custom chart for each fuel type
-                                ],
+                          ),
+                          SizedBox(
+                            height: 20,
+                          )
+                        ],
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  isGridView ? Icons.list : Icons.grid_view,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    isGridView =
+                                        !isGridView; // Toggle the boolean value
+                                  });
+                                },
                               ),
-                            );
-                          }).toList(),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: isGridView
+                                ? GridView.builder(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      mainAxisExtent: 133,
+                                      crossAxisCount: 2, // 2 cards per row
+                                      crossAxisSpacing: 14,
+                                      mainAxisSpacing: 16,
+                                      // childAspectRatio: 1.2, // Adjust the aspect ratio
+                                    ),
+                                    itemCount: fuelData.length,
+                                    itemBuilder: (context, index) {
+                                      return FuelCard(
+                                        fuelType: fuelData[index]['fuelType'],
+                                        price: fuelData[index]['price'],
+                                        sale: fuelData[index]['sale'],
+                                        liters: fuelData[index]['liters'],
+                                      );
+                                    },
+                                  )
+                                : ListView.builder(
+                                    // padding: EdgeInsets.symmetric(vertical: ),
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: fuelData.length,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                        child: FuelCard(
+                                          fuelType: fuelData[index]['fuelType'],
+                                          price: fuelData[index]['price'],
+                                          sale: fuelData[index]['sale'],
+                                          liters: fuelData[index]['liters'],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          )
+                        ],
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  isGridView ? Icons.list : Icons.grid_view,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    isGridView =
+                                        !isGridView; // Toggle the boolean value
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: isGridView
+                                ? GridView.builder(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      mainAxisExtent: 133,
+                                      crossAxisCount: 2, // 2 cards per row
+                                      crossAxisSpacing: 14,
+                                      mainAxisSpacing: 16,
+                                      // childAspectRatio: 1.2, // Adjust the aspect ratio
+                                    ),
+                                    itemCount: fuelData.length,
+                                    itemBuilder: (context, index) {
+                                      return FuelCard(
+                                        fuelType: fuelData[index]['fuelType'],
+                                        price: fuelData[index]['price'],
+                                        sale: fuelData[index]['sale'],
+                                        liters: fuelData[index]['liters'],
+                                      );
+                                    },
+                                  )
+                                : ListView.builder(
+                                    // padding: EdgeInsets.symmetric(vertical: ),
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: fuelData.length,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                        child: FuelCard(
+                                          fuelType: fuelData[index]['fuelType'],
+                                          price: fuelData[index]['price'],
+                                          sale: fuelData[index]['sale'],
+                                          liters: fuelData[index]['liters'],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          )
+                        ],
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  isGridView ? Icons.list : Icons.grid_view,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    isGridView =
+                                        !isGridView; // Toggle the boolean value
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: isGridView
+                                ? GridView.builder(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      mainAxisExtent: 133,
+                                      crossAxisCount: 2, // 2 cards per row
+                                      crossAxisSpacing: 14,
+                                      mainAxisSpacing: 16,
+                                      // childAspectRatio: 1.2, // Adjust the aspect ratio
+                                    ),
+                                    itemCount: fuelData.length,
+                                    itemBuilder: (context, index) {
+                                      return FuelCard(
+                                        fuelType: fuelData[index]['fuelType'],
+                                        price: fuelData[index]['price'],
+                                        sale: fuelData[index]['sale'],
+                                        liters: fuelData[index]['liters'],
+                                      );
+                                    },
+                                  )
+                                : ListView.builder(
+                                    // padding: EdgeInsets.symmetric(vertical: ),
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: fuelData.length,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                        child: FuelCard(
+                                          fuelType: fuelData[index]['fuelType'],
+                                          price: fuelData[index]['price'],
+                                          sale: fuelData[index]['sale'],
+                                          liters: fuelData[index]['liters'],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          )
                         ],
                       ),
                     ),
 
-                    // Monthly Graph
-                    SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          SizedBox(height: 22.h),
-                          ...fuels.map((fuel) {
-                            return Container(
-                              width: 327.w,
-                              height: 158.h,
-                              margin: const EdgeInsets.only(
-                                  bottom: 10), // 10 pixels bottom margin
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(34, 34, 34, 1),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(width: 1),
-                              ),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 8.0),
-                                        child: Text(
-                                          fuel[0], // Fuel name
-                                          style:
-                                              AppColors.headingStyle.copyWith(
-                                            fontSize: 20.sp,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColors.primaryTextColor,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.all(4.5),
-                                        width: 200.w,
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(20),
-                                            bottomLeft: Radius.circular(20),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            RichText(
-                                              text: TextSpan(
-                                                children: [
-                                                  TextSpan(
-                                                    text: fuel[1], // Price
-                                                    style: AppColors
-                                                        .subtitleStyle
-                                                        .copyWith(
-                                                      color: AppColors
-                                                          .primaryTextColor,
-                                                      fontSize: 16.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: ' rs',
-                                                    style: AppColors
-                                                        .subtitleStyle
-                                                        .copyWith(
-                                                      color: AppColors
-                                                          .primaryTextColor,
-                                                      fontSize: 10.sp,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(width: 10.w),
-                                            RichText(
-                                              text: TextSpan(
-                                                children: [
-                                                  TextSpan(
-                                                    text: fuel[2], // Quantity
-                                                    style: AppColors
-                                                        .subtitleStyle
-                                                        .copyWith(
-                                                      color: AppColors
-                                                          .primaryTextColor,
-                                                      fontSize: 20.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: ' ltr',
-                                                    style: AppColors
-                                                        .subtitleStyle
-                                                        .copyWith(
-                                                      color: AppColors
-                                                          .primaryTextColor,
-                                                      fontSize: 10.sp,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Center(
-                                      child:
-                                          const CustomLineChartMonth()), // Custom chart for each fuel type
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ],
-                      ),
-                    ),
-
-                    SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          SizedBox(height: 22.h),
-                          ...fuels.map((fuel) {
-                            return Container(
-                              width: 327.w,
-                              height: 158.h,
-                              margin: const EdgeInsets.only(
-                                  bottom: 10), // 10 pixels bottom margin
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(34, 34, 34, 1),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(width: 1),
-                              ),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 8.0),
-                                        child: Text(
-                                          fuel[0], // Fuel name
-                                          style:
-                                              AppColors.headingStyle.copyWith(
-                                            fontSize: 20.sp,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColors.primaryTextColor,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.all(4.5),
-                                        width: 200.w,
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(20),
-                                            bottomLeft: Radius.circular(20),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            RichText(
-                                              text: TextSpan(
-                                                children: [
-                                                  TextSpan(
-                                                    text: fuel[1], // Price
-                                                    style: AppColors
-                                                        .subtitleStyle
-                                                        .copyWith(
-                                                      color: AppColors
-                                                          .primaryTextColor,
-                                                      fontSize: 16.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: ' rs',
-                                                    style: AppColors
-                                                        .subtitleStyle
-                                                        .copyWith(
-                                                      color: AppColors
-                                                          .primaryTextColor,
-                                                      fontSize: 10.sp,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(width: 10.w),
-                                            RichText(
-                                              text: TextSpan(
-                                                children: [
-                                                  TextSpan(
-                                                    text: fuel[2], // Quantity
-                                                    style: AppColors
-                                                        .subtitleStyle
-                                                        .copyWith(
-                                                      color: AppColors
-                                                          .primaryTextColor,
-                                                      fontSize: 20.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: ' ltr',
-                                                    style: AppColors
-                                                        .subtitleStyle
-                                                        .copyWith(
-                                                      color: AppColors
-                                                          .primaryTextColor,
-                                                      fontSize: 10.sp,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Center(
-                                      child:
-                                          const CustomLineChartMonth()), // Custom chart for each fuel type
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class FuelCard extends StatelessWidget {
+  final String fuelType;
+  final double price;
+  final double sale;
+  final double liters;
+
+  FuelCard({
+    required this.fuelType,
+    required this.price,
+    required this.sale,
+    required this.liters,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      // margin: EdgeInsets.symmetric(vertical: 5),
+      decoration: BoxDecoration(
+        color: Color(0xff222222),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 5),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.local_gas_station, color: Colors.redAccent),
+              SizedBox(width: 5),
+              Text(
+                '1',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(width: 5),
+              Text(
+                fuelType,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 5),
+          _buildInfoRow(
+              'Price',
+              price.toStringAsFixed(2),
+              true,
+              BorderRadius.only(
+                  topLeft: Radius.circular(10), topRight: Radius.circular(10))),
+          _buildInfoRow(
+              'Sale', sale.toStringAsFixed(2), false, BorderRadius.zero),
+          _buildInfoRow(
+              'Ltr',
+              liters.toStringAsFixed(2),
+              true,
+              BorderRadius.only(
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value, bool showRadius,
+      BorderRadiusGeometry? borderRadius) {
+    return Container(
+      // margin:EdgeInsets.zero,
+      padding: EdgeInsets.zero,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        color: Colors.redAccent,
+        borderRadius: showRadius == true
+            ? borderRadius
+            : null, // Rounded corners for inner blocks
+      ),
+      margin: EdgeInsets.only(top: 7),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            alignment: Alignment.center,
+            width: 48,
+            padding: EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              color: Colors.blueAccent,
+            ),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          SizedBox(
+            width: 14,
+          )
+        ],
       ),
     );
   }

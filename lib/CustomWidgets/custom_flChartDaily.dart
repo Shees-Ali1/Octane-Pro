@@ -64,6 +64,7 @@ class _CustomLineChartDailyState extends State<CustomLineChartDaily> {
 
   LineChartData mainData() {
     return LineChartData(
+
       gridData: FlGridData(show: false),
       titlesData: FlTitlesData(
         show: true,
@@ -109,7 +110,7 @@ class _CustomLineChartDailyState extends State<CustomLineChartDaily> {
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
-              colors: gradientColors.map((color) => color.withOpacity(0.3)).toList(),
+              colors: gradientColors.map((color) => color.withOpacity(0.7)).toList(),
             ),
           ),
         ),

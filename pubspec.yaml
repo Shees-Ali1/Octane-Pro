@@ -46,6 +46,7 @@ dependencies:
   firebase_core:
   http:
   cloud_firestore:
+  sensors_plus:
 
 
 dev_dependencies:

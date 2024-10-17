@@ -86,8 +86,14 @@ class _ListingScreenState extends State<ListingScreen> with TickerProviderStateM
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 16.0.h, horizontal: 16.0.w),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    SvgPicture.asset(
+                      AppIcons.drawer,
+                      height: 30.h,
+                      width: 30.w,
+                      fit: BoxFit.fill,
+                    ),
                     SvgPicture.asset(
                       AppIcons.filter,
                       height: 30.h,
