@@ -119,201 +119,133 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
 
                 // SALE SUMMARY
+                // SALE SUMMARY
                 ScaleTransition(
                   scale: _scaleAnimation,
-                  child: StreamBuilder<List<Map<String, dynamic>>>(
-                    stream: saleSummaryController.getSaleSummaryStream(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Center(child: Text('No sales data available.',style: TextStyle(color: Colors.white),));
-                      }
-
-                      final List<Map<String, dynamic>> fuelData =
-                          snapshot.data!;
-
-                      // Initialize totals for petrol, diesel, and hobc
-                      double petrolTotalLiters = 0.0;
-                      double petrolTotalPrice = 0.0;
-                      double dieselTotalLiters = 0.0;
-                      double dieselTotalPrice = 0.0;
-                      double hobcTotalLiters = 0.0;
-                      double hobcTotalPrice = 0.0;
-
-                      // Calculate totals
-                      for (var fuel in fuelData) {
-                        String type = fuel['type'] as String; // Cast to String
-                        double liters = (fuel['liter'] as num?)?.toDouble() ??
-                            0.0; // Cast to double
-                        double price = (fuel['price'] as num?)?.toDouble() ??
-                            0.0; // Cast to double
-
-                        if (type == 'Petrol') {
-                          petrolTotalLiters += liters;
-                          petrolTotalPrice += price;
-                        } else if (type == 'Diesel') {
-                          dieselTotalLiters += liters;
-                          dieselTotalPrice += price;
-                        } else if (type == 'Hobc') {
-                          hobcTotalLiters += liters;
-                          hobcTotalPrice += price;
-                        }
-                      }
-
-                      // Create a list to display
-                      final totals = [
-                        {
-                          'type': 'Petrol',
-                          'liters': petrolTotalLiters,
-                          'price': petrolTotalPrice
-                        },
-                        {
-                          'type': 'Diesel',
-                          'liters': dieselTotalLiters,
-                          'price': dieselTotalPrice
-                        },
-                        {
-                          'type': 'Hobc',
-                          'liters': hobcTotalLiters,
-                          'price': hobcTotalPrice
-                        },
-                      ];
-
-                      return Container(
-                        padding: EdgeInsets.all(7),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Color.fromRGBO(30, 31, 35, 1),
-                              Color.fromRGBO(9, 10, 10, 1),
-                            ],
+                  child: Container(
+                    padding: EdgeInsets.all(7),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Color.fromRGBO(30, 31, 35, 1),
+                          Color.fromRGBO(9, 10, 10, 1),
+                        ],
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          "Sale Summary",
+                          style: AppColors.headingStyle.copyWith(
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.summryRed,
                           ),
                         ),
-                        child: Column(
+                        SizedBox(height: 12.h),
+                        Column(
                           children: [
-                            Text(
-                              "Sale Summary",
-                              style: AppColors.headingStyle.copyWith(
-                                fontSize: 20.sp,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.summryRed,
-                              ),
-                            ),
-                            SizedBox(height: 12.h),
-                            Column(
-                              children: totals.map((fuel) {
-                                return Padding(
-                                  padding: EdgeInsets.only(bottom: 10.h),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          fuel['type']
-                                              as String, // Cast to String
-                                          textAlign: TextAlign.center,
-                                          style: AppColors.small.copyWith(
-                                            fontSize: 16.sp,
-                                            color: AppColors.primaryTextColor,
-                                          ),
-                                        ),
+                            // Define your static data for the sale summary
+                            {'type': 'Petrol', 'liters': 1200.0, 'price': 85000.0},
+                            {'type': 'Diesel', 'liters': 900.0, 'price': 75000.0},
+                            {'type': 'Hobc', 'liters': 300.0, 'price': 30000.0},
+                          ].map((fuel) {
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 10.h),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      fuel['type'] as String,
+                                      textAlign: TextAlign.center,
+                                      style: AppColors.small.copyWith(
+                                        fontSize: 16.sp,
+                                        color: AppColors.primaryTextColor,
                                       ),
-                                      Container(
-                                        width: 97.w,
-                                        height: 33.h,
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(10),
-                                            bottomLeft: Radius.circular(10),
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Text.rich(
-                                            TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text:
-                                                      "${fuel['liters']}", // Show liters
-                                                  style: AppColors.subtitleStyle
-                                                      .copyWith(
-                                                    fontSize: 20.sp,
-                                                    color: AppColors
-                                                        .primaryTextColor,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text: " ltr",
-                                                  style: AppColors.subtitleStyle
-                                                      .copyWith(
-                                                    fontSize: 10.sp,
-                                                    color: AppColors
-                                                        .primaryTextColor,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 7.w),
-                                      Container(
-                                        width: 101.w,
-                                        height: 33.h,
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(10),
-                                            bottomRight: Radius.circular(10),
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Text.rich(
-                                            TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: formatPrice(fuel[
-                                                          'price']
-                                                      as double), // Cast to double
-                                                  style: AppColors.headingStyle
-                                                      .copyWith(
-                                                    fontSize: 16.sp,
-                                                    color: AppColors
-                                                        .primaryTextColor,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text: " rs.",
-                                                  style:
-                                                      AppColors.small.copyWith(
-                                                    fontSize: 10.sp,
-                                                    color: AppColors
-                                                        .primaryTextColor,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 20.w),
-                                    ],
+                                    ),
                                   ),
-                                );
-                              }).toList(),
-                            ),
-                          ],
+                                  Container(
+                                    width: 97.w,
+                                    height: 33.h,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        bottomLeft: Radius.circular(10),
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text.rich(
+                                        TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: "${fuel['liters']}",
+                                              style: AppColors.subtitleStyle.copyWith(
+                                                fontSize: 20.sp,
+                                                color: AppColors.primaryTextColor,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: " ltr",
+                                              style: AppColors.subtitleStyle.copyWith(
+                                                fontSize: 10.sp,
+                                                color: AppColors.primaryTextColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 7.w),
+                                  Container(
+                                    width: 101.w,
+                                    height: 33.h,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(10),
+                                        bottomRight: Radius.circular(10),
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text.rich(
+                                        TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: formatPrice(fuel['price'] as double),
+                                              style: AppColors.headingStyle.copyWith(
+                                                fontSize: 16.sp,
+                                                color: AppColors.primaryTextColor,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: " rs.",
+                                              style: AppColors.small.copyWith(
+                                                fontSize: 10.sp,
+                                                color: AppColors.primaryTextColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 20.w),
+                                ],
+                              ),
+                            );
+                          }).toList(),
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
                 ),
+
 
                 SizedBox(height: 10.h),
 
