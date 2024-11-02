@@ -18,11 +18,11 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
-  final Authcontroller authcontroller = Get.put(Authcontroller());
-  final SaleSummaryController saleSummaryController = Get.put(SaleSummaryController());
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
+  final Authcontroller authcontroller = Get.find();
+  final SaleSummaryController saleSummaryController =
+      Get.put(SaleSummaryController());
 
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -36,13 +36,11 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeIn)
-    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
-    _slideAnimation = Tween<Offset>(begin: Offset(0.0, 1.0), end: Offset.zero).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeOut)
-    );
+    _slideAnimation = Tween<Offset>(begin: Offset(0.0, 1.0), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
   }
@@ -81,7 +79,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
               top: 80.h,
               right: 0,
               left: 0,
-              child:  FadeTransition(
+              child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: Image.asset(
                   AppImages.OCTANEpro,
@@ -110,13 +108,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         SizedBox(height: 64.h),
                         Text(
                           'Login',
-                          style: AppColors.headingStyle.copyWith(color: Colors.white, fontSize: 35.sp),
+                          style: AppColors.headingStyle
+                              .copyWith(color: Colors.white, fontSize: 35.sp),
                         ),
                         SizedBox(height: 20.h),
                         SizedBox(
                           width: 311.w,
                           child: CustomInputField(
-                            controller: usernameController,
+                            controller: authcontroller.emailController,
                             label: 'Your Email',
                             svgIconPath: AppIcons.emailIcon,
                             validator: (value) {
@@ -131,7 +130,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         SizedBox(
                           width: 311.w,
                           child: CustomInputField(
-                            controller: passwordController,
+                            controller: authcontroller.passwordController,
                             label: 'Your Password',
                             obscureText: true,
                             svgIconPath: AppIcons.passwordIcon,
@@ -150,22 +149,25 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             child: Row(
                               children: [
                                 Obx(
-                                      () => GestureDetector(
+                                  () => GestureDetector(
                                     onTap: () {
-                                      authcontroller.checkBox.value = !authcontroller.checkBox.value;
-
+                                      authcontroller.checkBox.value =
+                                          !authcontroller.checkBox.value;
                                     },
                                     child: Container(
                                       width: 20,
                                       height: 20,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        border: Border.all(color: AppColors.borderColor),
+                                        border: Border.all(
+                                            color: AppColors.borderColor),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Center(
                                         child: Icon(
-                                          authcontroller.checkBox.value ? Icons.check : null,
+                                          authcontroller.checkBox.value
+                                              ? Icons.check
+                                              : null,
                                           size: 16,
                                           color: AppColors.bottomColor,
                                         ),
@@ -176,12 +178,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                 SizedBox(width: 8.w),
                                 Text(
                                   "Remember information",
-                                  style: AppColors.headingStyle.copyWith(color: Colors.white, fontSize: 10.sp),
+                                  style: AppColors.headingStyle.copyWith(
+                                      color: Colors.white, fontSize: 10.sp),
                                 ),
                                 Spacer(),
                                 Text(
                                   "Forgot Password",
-                                  style: AppColors.headingStyle.copyWith(color: AppColors.forgot, fontSize: 15.sp),
+                                  style: AppColors.headingStyle.copyWith(
+                                      color: AppColors.forgot, fontSize: 15.sp),
                                 ),
                               ],
                             ),
@@ -193,17 +197,19 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           width: 311.w,
                           height: 61.h,
                           child: ElevatedButton(
-                            onPressed: () async {
-                             // await saleSummaryController.fetchSaleSummary();
-                              Get.to(BottomNav());
-                            },
-                            child: Text(
-                              'Login',
-                              style: AppColors.headingStyle.copyWith(
-                                color: AppColors.bottomColor,
-                                fontSize: 19.sp,
-                              ),
-                            ),
+                            onPressed: authcontroller.loginUser,
+                            child: authcontroller.isLoading.value
+                                ? Center(
+                                    child: CircularProgressIndicator(
+                                    color: Colors.black,
+                                  ))
+                                : Text(
+                                    'Login',
+                                    style: AppColors.headingStyle.copyWith(
+                                      color: AppColors.bottomColor,
+                                      fontSize: 19.sp,
+                                    ),
+                                  ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.inputBtnColor,
                               shape: RoundedRectangleBorder(
