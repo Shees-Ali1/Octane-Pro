@@ -7,6 +7,7 @@ import '../Screens/Details/Details.dart';
 import '../Screens/Details/realData.dart';
 import '../Screens/HomePage/home_Page.dart';
 import '../Screens/Listing/listing_screen.dart';
+import '../Screens/Profile/ProfilePage.dart';
 
 class BottomNav extends StatefulWidget {
   const BottomNav({super.key});
@@ -24,7 +25,7 @@ class _BottomNavState extends State<BottomNav> {
       HomePage(),
       ListingScreen(), // Replace with actual screens
       DetailsScreen(),
-      HomePage(),
+      ProfilePage(),
     ];
   }
 
