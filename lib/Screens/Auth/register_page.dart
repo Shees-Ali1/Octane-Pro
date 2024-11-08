@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -97,10 +98,21 @@ class _RegisterPageState extends State<RegisterPage>
 
     isLoading.value = true;
     try {
-      await _auth.createUserWithEmailAndPassword(
+      // Register the user with Firebase Authentication
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
+
+      // Save additional user details in Firestore
+      await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).set({
+        'name': nameController.text.trim(),
+        'pumpName': pumpNameController.text.trim(),
+        'email': emailController.text.trim(),
+        'createdAt': Timestamp.now(),
+      });
+
+      // Navigate to the login page after successful registration
       Get.off(() => LoginPage());
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", e.message ?? "Unknown error",

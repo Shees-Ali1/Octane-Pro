@@ -1,22 +1,40 @@
 {
   "project_info": {
-    "project_number": "944604910155",
-    "firebase_url": "https://js-petrol-default-rtdb.firebaseio.com",
-    "project_id": "js-petrol",
-    "storage_bucket": "js-petrol.appspot.com"
+    "project_number": "715070587636",
+    "project_id": "new-petrol-477fd",
+    "storage_bucket": "new-petrol-477fd.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:944604910155:android:c6d3c6a7cc795e01b533ce",
+        "mobilesdk_app_id": "1:715070587636:android:f5cbce3bf49e059fc494a1",
         "android_client_info": {
-          "package_name": "com.example.octane_pro"
+          "package_name": "com.example.app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyB2zj4rmEF3IskNdyo_zxmlmgINo5YfC5g"
+          "current_key": "AIzaSyCgwVfHLxMoqsjr3wVuVayBWC1jI9h6680"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715070587636:android:7dd7247bcf3e0b76c494a1",
+        "android_client_info": {
+          "package_name": "com.example.new_octane"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgwVfHLxMoqsjr3wVuVayBWC1jI9h6680"
         }
       ],
       "services": {

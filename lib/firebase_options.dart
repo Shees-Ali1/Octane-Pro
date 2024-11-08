@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -50,21 +47,30 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB2zj4rmEF3IskNdyo_zxmlmgINo5YfC5g',
-    appId: '1:944604910155:android:c6d3c6a7cc795e01b533ce',
-    messagingSenderId: '944604910155',
-    projectId: 'js-petrol',
-    databaseURL: 'https://js-petrol-default-rtdb.firebaseio.com',
-    storageBucket: 'js-petrol.appspot.com',
+    apiKey: 'AIzaSyCgwVfHLxMoqsjr3wVuVayBWC1jI9h6680',
+    appId: '1:715070587636:android:f5cbce3bf49e059fc494a1',
+    messagingSenderId: '715070587636',
+    projectId: 'new-petrol-477fd',
+    storageBucket: 'new-petrol-477fd.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA4oS1caCvKG9t9uaZSJCyI3JRhVCDZf2s',
-    appId: '1:944604910155:ios:ede8a1bd8cab306ab533ce',
-    messagingSenderId: '944604910155',
-    projectId: 'js-petrol',
-    databaseURL: 'https://js-petrol-default-rtdb.firebaseio.com',
-    storageBucket: 'js-petrol.appspot.com',
-    iosBundleId: 'com.example.octanePro',
+    apiKey: 'AIzaSyDxiTFa4qNHqfq1C_pmDR0YFC_d6QEK-MA',
+    appId: '1:715070587636:ios:0454904185865ef2c494a1',
+    messagingSenderId: '715070587636',
+    projectId: 'new-petrol-477fd',
+    storageBucket: 'new-petrol-477fd.firebasestorage.app',
+    iosBundleId: 'Octane.com.app',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyAM8m4_jQvFFD4I5fFAS-TcD_NkZIZPJ5o',
+    appId: '1:715070587636:web:008f5e8ec7d69b16c494a1',
+    messagingSenderId: '715070587636',
+    projectId: 'new-petrol-477fd',
+    authDomain: 'new-petrol-477fd.firebaseapp.com',
+    storageBucket: 'new-petrol-477fd.firebasestorage.app',
+    measurementId: 'G-54ZPQ7ZQNK',
+  );
+
 }
