@@ -176,18 +176,18 @@ class _DetailsScreenState extends State<DetailsScreen>
     final List<Map<String, dynamic>> fuelData = [
       {
         'fuelType': 'Petrol',
-        'price': 248.99,
-        'sale': 12000.00,
-        'liters': 18.00
+        'price': "248.99",
+        'sale': "12000.00",
+        'liters': "18.00"
       },
       {
         'fuelType': 'Diesel',
-        'price': 248.99,
-        'sale': 12000.00,
-        'liters': 18.00
+        'price': "248.99",
+        'sale': "12000.00",
+        'liters': "18.00"
       },
-      {'fuelType': 'CNG', 'price': 45.99, 'sale': 5000.00, 'liters': 15.00},
-      {'fuelType': 'LPG', 'price': 65.99, 'sale': 7000.00, 'liters': 10.00},
+      {'fuelType': 'CNG', 'price': "45.99", 'sale': "5000.00", 'liters': "15.00"},
+      {'fuelType': 'LPG', 'price': "65.99", 'sale': "7000.00", 'liters': "10.00"},
     ];
     return Scaffold(
       backgroundColor: AppColors.darkBlack,
