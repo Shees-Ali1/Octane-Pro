@@ -1,10 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:octane_pro/GetxControllers/AuthController.dart';
 import 'package:octane_pro/GetxControllers/Sale-Controller/SaleSummaryController.dart';
+import 'package:octane_pro/Screens/Auth/register_page.dart';
 
 import '../../CustomWidgets/CustomInputField.dart';
 import '../../NavBar/bottom_Bar.dart';
@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
   final Authcontroller authcontroller = Get.find();
   final SaleSummaryController saleSummaryController =
-      Get.put(SaleSummaryController());
+  Get.put(SaleSummaryController());
 
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -51,6 +51,36 @@ class _LoginPageState extends State<LoginPage>
     super.dispose();
   }
 
+  void _showValidationMessage(String message) {
+    Get.snackbar(
+      "Validation Error",
+      message,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      borderRadius: 10,
+      icon: Icon(Icons.warning, color: Colors.white),
+    );
+  }
+
+  void _validateAndLogin() {
+    final email = authcontroller.emailController.text.trim();
+    final password = authcontroller.passwordController.text.trim();
+
+    if (email.isEmpty || !email.contains('@')) {
+      _showValidationMessage('Please enter a valid email address');
+      return;
+    }
+    if (password.isEmpty) {
+      _showValidationMessage('Please enter your password');
+      return;
+    }
+
+    // Call login method if validation passes
+    authcontroller.loginUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +104,6 @@ class _LoginPageState extends State<LoginPage>
         ),
         child: Stack(
           children: [
-            // Fade-in Animation for the Logo
             Positioned(
               top: 80.h,
               right: 0,
@@ -118,12 +147,6 @@ class _LoginPageState extends State<LoginPage>
                             controller: authcontroller.emailController,
                             label: 'Your Email',
                             svgIconPath: AppIcons.emailIcon,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your username';
-                              }
-                              return null;
-                            },
                           ),
                         ),
                         SizedBox(height: 6.h),
@@ -134,12 +157,6 @@ class _LoginPageState extends State<LoginPage>
                             label: 'Your Password',
                             obscureText: true,
                             svgIconPath: AppIcons.passwordIcon,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              return null;
-                            },
                           ),
                         ),
                         Container(
@@ -149,10 +166,10 @@ class _LoginPageState extends State<LoginPage>
                             child: Row(
                               children: [
                                 Obx(
-                                  () => GestureDetector(
+                                      () => GestureDetector(
                                     onTap: () {
                                       authcontroller.checkBox.value =
-                                          !authcontroller.checkBox.value;
+                                      !authcontroller.checkBox.value;
                                     },
                                     child: Container(
                                       width: 20,
@@ -192,24 +209,24 @@ class _LoginPageState extends State<LoginPage>
                           ),
                         ),
                         SizedBox(height: 70.h),
-                        // LOGIN BUTTON
                         SizedBox(
                           width: 311.w,
                           height: 61.h,
                           child: ElevatedButton(
-                            onPressed: authcontroller.loginUser,
+                            onPressed: _validateAndLogin,
                             child: authcontroller.isLoading.value
                                 ? Center(
-                                    child: CircularProgressIndicator(
-                                    color: Colors.black,
-                                  ))
+                              child: CircularProgressIndicator(
+                                color: Colors.black,
+                              ),
+                            )
                                 : Text(
-                                    'Login',
-                                    style: AppColors.headingStyle.copyWith(
-                                      color: AppColors.bottomColor,
-                                      fontSize: 19.sp,
-                                    ),
-                                  ),
+                              'Login',
+                              style: AppColors.headingStyle.copyWith(
+                                color: AppColors.bottomColor,
+                                fontSize: 19.sp,
+                              ),
+                            ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.inputBtnColor,
                               shape: RoundedRectangleBorder(
@@ -221,6 +238,33 @@ class _LoginPageState extends State<LoginPage>
                               ),
                               elevation: 5,
                             ),
+                          ),
+                        ),
+                        SizedBox(height: 10.h),
+                        RichText(
+                          text: TextSpan(
+                            style: AppColors.headingStyle.copyWith(
+                              color: AppColors.primaryTextColor,
+                              fontSize: 15.sp,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "Register with new account? ",
+                              ),
+                              TextSpan(
+                                text: "Register",
+                                style: AppColors.headingStyle.copyWith(
+                                  color: AppColors.forgot,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.sp,
+                                  decoration: TextDecoration.underline,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Get.off(() => RegisterPage());
+                                  },
+                              ),
+                            ],
                           ),
                         ),
                       ],

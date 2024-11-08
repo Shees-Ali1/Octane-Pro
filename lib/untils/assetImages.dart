@@ -7,6 +7,8 @@ class AppIcons {
   static const String passwordIcon = 'assets/icons/pass.svg';
   static const String drawer = 'assets/icons/drawer.svg';
   static const String filter = 'assets/icons/filter.svg';
+  static const String userIcon = 'assets/icons/person.svg';
+  static const String pump = 'assets/icons/pump.svg';
 
 // Add more icons here
 }

@@ -24,8 +24,6 @@ class Authcontroller extends GetxController {
           email: emailController.text.trim(),
           password: passwordController.text.trim());
       if (FirebaseAuth.instance.currentUser!.uid != null) {
-        Get.snackbar('Success', 'Login Success',
-            backgroundColor: Colors.white, colorText: Colors.black);
         isLoading.value = false;
         Get.offAll(const BottomNav());
         emailController.clear();

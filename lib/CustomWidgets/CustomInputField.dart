@@ -8,6 +8,7 @@ class CustomInputField extends StatefulWidget {
   final String label;
   final bool obscureText; // Initially passed as true for password
   final String? svgIconPath; // Path to SVG icon
+  final Color? iconColor; // Color for the SVG icon
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final String? hintText;
@@ -17,6 +18,7 @@ class CustomInputField extends StatefulWidget {
     required this.label,
     this.obscureText = false, // Default to false unless used for password
     this.svgIconPath,
+    this.iconColor, // Color for the SVG icon
     this.keyboardType = TextInputType.text,
     this.validator,
     this.hintText,
@@ -44,18 +46,17 @@ class _CustomInputFieldState extends State<CustomInputField> {
         obscureText: _obscureText, // Toggles based on eye icon
         keyboardType: widget.keyboardType,
         obscuringCharacter: '*',
-        style:AppColors.descriptionStyle.copyWith(
-          color: AppColors.bottomColor, // Slightly transparent for the hint
+        style: AppColors.descriptionStyle.copyWith(
+          color: AppColors.bottomColor,
         ),
         decoration: InputDecoration(
-          floatingLabelBehavior: FloatingLabelBehavior.never, // Prevent label from floating
+          floatingLabelBehavior: FloatingLabelBehavior.never,
           fillColor: AppColors.inputBtnColor,
           filled: true,
           labelText: widget.label,
-
           hintText: widget.hintText,
           hintStyle: AppColors.descriptionStyle.copyWith(
-            color: AppColors.bottomColor, // Slightly transparent for the hint
+            color: AppColors.bottomColor,
           ),
           labelStyle: AppColors.headingStyle.copyWith(
             color: AppColors.bottomColor,
@@ -66,9 +67,10 @@ class _CustomInputFieldState extends State<CustomInputField> {
             padding: EdgeInsets.all(8.0), // Add padding around the icon
             child: SvgPicture.asset(
               widget.svgIconPath!,
-              fit: BoxFit.scaleDown, // Ensures the icon scales down without distortion
+              fit: BoxFit.scaleDown,
               width: 24.0,
               height: 24.0,
+              color: widget.iconColor ?? AppColors.bottomColor, // Apply color
             ),
           )
               : null,
@@ -87,7 +89,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
               : null,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: AppColors.borderColor, width: 3.0), // Default border color
+            borderSide: BorderSide(color: AppColors.borderColor, width: 3.0),
           ),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: AppColors.borderColor, width: 3.0),
