@@ -30,6 +30,35 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
             children: [
               Align(
                 alignment: Alignment.centerLeft,
+                child: Text("Show by last:",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                    fontFamily: "Jost",
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _buildTimeButton("12 hours", "12 hours"),
+                  _buildTimeButton("24 hours", "24 hours"),
+
+                ],
+              ),
+              SizedBox(height: 10,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _buildTimeButton("Week", "Week"),
+                  _buildTimeButton("Month", "Month"),
+                ],
+              ),
+              SizedBox(height: 20),
+              Align(
+                alignment: Alignment.centerLeft,
                 child: Text("Sort by:",
                   style: TextStyle(
                     fontSize: 20,
@@ -41,7 +70,7 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
               ),
               SizedBox(height: 20),
               Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   _buildShiftButton("A", "Shift A"),
                   _buildShiftButton("B", "Shift B"),
@@ -52,10 +81,18 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _buildDialogButton(context, "Apply", () async {
-                    tableVM.applyFilter();
+
+                    if(tableVM.shift.value != ""){
+                      tableVM.applyFilter();
+                    } else {
+                      tableVM.resetData();
+                      tableVM.fetchSalesDataWithTimeFilter(tableVM.time.value); // Fetch data from the last 12 hours
+                    }
+
                   }),
                   _buildDialogButton(context, "Cancel", () {
                     tableVM.shift.value = "";
+                    tableVM.time.value = "";
                     tableVM.resetData();
                     tableVM.applyFilter();
                   }),
@@ -71,6 +108,7 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
   Widget _buildShiftButton(String shiftValue, String label) {
     return GestureDetector(
       onTap: () {
+        tableVM.time.value = "";
         tableVM.shift.value = shiftValue;
       },
       child: Obx(() => Container(
@@ -94,6 +132,34 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
       )),
     );
   }
+  Widget _buildTimeButton(String shiftValue, String label) {
+    return GestureDetector(
+      onTap: () {
+        tableVM.shift.value = '';
+        tableVM.time.value = shiftValue;
+      },
+      child: Obx(() => Container(
+        margin: EdgeInsets.only(right: 12),
+        padding: EdgeInsets.symmetric(horizontal: 12),
+        height: 40,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: tableVM.time.value == shiftValue ? Colors.red : Colors.black,
+          border: Border.all(width: 1, color: Colors.red),
+        ),
+        alignment: Alignment.center,
+        child: Text(label,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: tableVM.time.value == shiftValue ? Colors.white : Colors.red,
+            fontFamily: "Jost",
+          ),
+        ),
+      )),
+    );
+  }
+
 
   Widget _buildDialogButton(BuildContext context, String label, VoidCallback onTap) {
     return GestureDetector(

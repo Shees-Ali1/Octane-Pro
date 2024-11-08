@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 class TableDataController extends GetxController {
   RxString shift = "".obs;
+  RxString time = "".obs;
   RxList<QueryDocumentSnapshot> salesData = <QueryDocumentSnapshot>[].obs;
   RxBool isLoading = false.obs;
   RxBool hasMore = true.obs;
@@ -86,4 +87,72 @@ class TableDataController extends GetxController {
     isLoading.value = false;
     Get.back();
   }
+
+  Future<void> fetchSalesDataWithTimeFilter(String timeFilter) async {
+    if (isLoading.value || !hasMore.value) return;
+
+    isLoading.value = true;
+
+    // Calculate the start time based on the selected time filter
+    DateTime startTime;
+    DateTime currentTime = DateTime.now();
+
+    switch (timeFilter) {
+      case "12 hours":
+        startTime = currentTime.subtract(Duration(hours: 12));
+        break;
+      case "24 hours":
+        startTime = currentTime.subtract(Duration(hours: 24));
+        break;
+      case "Week":
+        startTime = currentTime.subtract(Duration(days: 7));
+        break;
+      case "Month":
+        startTime = currentTime.subtract(Duration(days: 30));  // Approximate month (30 days)
+        break;
+      default:
+      // Default to 1 day if an invalid filter is provided
+        startTime = currentTime.subtract(Duration(days: 1));
+        break;
+    }
+
+    // Build the base query
+    Query query = FirebaseFirestore.instance
+        .collection("sales")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("station1")
+        .orderBy('timestamp', descending: true)
+        .limit(pageSize);
+
+    if (lastDocument != null) {
+      query = query.startAfterDocument(lastDocument!);
+    }
+
+    final snapshot = await query.get();
+
+    if (snapshot.docs.isNotEmpty) {
+      lastDocument = snapshot.docs.last;
+
+      // Filter results based on the selected time filter
+      final filteredData = snapshot.docs.where((doc) {
+        final timestamp = (doc['timestamp'] as Timestamp).toDate();
+
+        // Only keep data within the selected time range
+        return timestamp.isAfter(startTime);
+      }).toList();
+
+      salesData.addAll(filteredData);
+
+      if (snapshot.docs.length < pageSize) {
+        hasMore.value = false;
+      }
+    } else {
+      hasMore.value = false;
+    }
+
+    isLoading.value = false;
+    Get.back();
+  }
+
+
 }

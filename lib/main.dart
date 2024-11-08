@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:octane_pro/GetxControllers/AuthController.dart';
 import 'package:octane_pro/GetxControllers/Sale-Controller/SaleSummaryController.dart';
+import 'package:octane_pro/GetxControllers/Sale-Controller/table_data_controller.dart';
+import 'package:octane_pro/NavBar/bottom_Bar.dart';
 
 import 'GetxControllers/Sale-Controller/FuelDataController.dart';
 import 'GetxControllers/dataController.dart';
@@ -17,6 +19,7 @@ void main() async {
   await Firebase.initializeApp(); // Initialize Firebase here
   Get.put(Authcontroller());
   Get.put(DataController());
+  Get.put(TableDataController());
   // Get.put(SaleSummaryController());
   Get.put(FuelDataController());
 
@@ -40,7 +43,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
         ),
-        home: SplashScreen(),
+        home: BottomNav(),
       ),
     );
   }
