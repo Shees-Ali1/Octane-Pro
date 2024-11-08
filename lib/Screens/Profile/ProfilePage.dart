@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../untils/utils.dart';
 import '../Auth/login_page.dart';
 
@@ -72,8 +73,7 @@ class ProfilePage extends StatelessWidget {
             // Logout Button
             ElevatedButton(
               onPressed: () async {
-                await FirebaseAuth.instance.signOut(); // Firebase logout functionality
-               Get.offAll(LoginPage());
+                logoutUser();
               },
 
               style: ElevatedButton.styleFrom(
@@ -116,4 +116,15 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+}
+// Logout method to remove the login status
+Future<void> logoutUser() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('isLoggedIn'); // Remove login status
+
+  // Log the user out from Firebase
+  await FirebaseAuth.instance.signOut();
+
+  // Navigate to the Login page
+  Get.offAll(() => const LoginPage());
 }

@@ -3,7 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:octane_pro/Screens/Auth/login_page.dart';
 import 'package:octane_pro/untils/assetImages.dart';
-import 'package:octane_pro/untils/utils.dart'; // Assuming AppColors is defined here
+import 'package:octane_pro/untils/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../NavBar/bottom_Bar.dart'; // Assuming AppColors is defined here
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -56,9 +59,17 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     // Start the text animation after the image animation is complete
     Future.delayed(Duration(seconds: 2), () {
       _textAnimationController.forward();
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(seconds: 2), () async{
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-        Get.off(LoginPage());
+        if (isLoggedIn) {
+          Get.offAll(() => const BottomNav());
+        }else{
+          Get.off(LoginPage());
+        }
+
+
       });
 
     });

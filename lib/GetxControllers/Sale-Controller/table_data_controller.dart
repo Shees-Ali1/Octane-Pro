@@ -47,7 +47,7 @@ class TableDataController extends GetxController {
     // Build the base query
     Query query = FirebaseFirestore.instance
         .collection("sales")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc('m4DrsbFKPzevANIrBmF54B0lzqY2')
         .collection("station1")
         .orderBy('timestamp', descending: true)
         .limit(pageSize);

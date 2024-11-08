@@ -67,25 +67,6 @@ class Authcontroller extends GetxController {
     }
   }
 
-  // Check login status on app start
-  Future<void> checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-    if (isLoggedIn) {
-      Get.offAll(() => const BottomNav());
-    }
-  }
 
-  // Logout method to remove the login status
-  Future<void> logoutUser() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('isLoggedIn'); // Remove login status
-
-    // Log the user out from Firebase
-    await FirebaseAuth.instance.signOut();
-
-    // Navigate to the Login page
-    Get.offAll(() => const LoginPage());
-  }
 }
