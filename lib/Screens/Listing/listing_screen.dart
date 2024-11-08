@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:octane_pro/CustomWidgets/CustomInputField.dart';
 import 'package:octane_pro/CustomWidgets/custom_flChart-week.dart';
 import 'package:octane_pro/CustomWidgets/custom_flChart_month.dart';
+import 'package:octane_pro/GetxControllers/graphController.dart';
 import 'package:octane_pro/untils/assetImages.dart';
 import 'package:octane_pro/untils/utils.dart';
 import '../../CustomWidgets/custom_flChartDaily.dart';
@@ -19,6 +21,8 @@ class ListingScreen extends StatefulWidget {
 }
 
 class _ListingScreenState extends State<ListingScreen> with TickerProviderStateMixin {
+  final GraphDataController graphDataController =
+  Get.put(GraphDataController());
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
   late Animation<Offset> _slideAnimation;
@@ -33,7 +37,7 @@ class _ListingScreenState extends State<ListingScreen> with TickerProviderStateM
   @override
   void initState() {
     super.initState();
-
+    graphDataController.fetchFuelData();
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
@@ -189,11 +193,23 @@ class _ListingScreenState extends State<ListingScreen> with TickerProviderStateM
                       child: Column(
                         children: [
                           SizedBox(height: 22.h),
-                          ...fuels.map((fuel) {
+                          ...graphDataController.fuels.map((fuel) {
+                            // Determine the correct data to pass based on the fuel type
+                            List<FlSpot> fuelData;
+                            if (fuel[0] == 'Petrol') {
+                              fuelData = graphDataController.petrolData;
+                            } else if (fuel[0] == 'Diesel') {
+                              fuelData = graphDataController.dieselData;
+                            } else if (fuel[0] == 'HOB') {
+                              fuelData = graphDataController.hobcData;
+                            } else {
+                              fuelData = [];
+                            }
+
                             return Container(
                               width: 327.w,
-                              height: 158.h,
-                              margin: const EdgeInsets.only(bottom: 10), // 10 pixels bottom margin
+                              height: 160.h,
+                              margin: const EdgeInsets.only(bottom: 10),
                               decoration: BoxDecoration(
                                 color: Color.fromRGBO(34, 34, 34, 1),
                                 borderRadius: BorderRadius.circular(20),
@@ -277,7 +293,9 @@ class _ListingScreenState extends State<ListingScreen> with TickerProviderStateM
                                       ),
                                     ],
                                   ),
-                                  Center(child: const CustomLineChartDaily()), // Custom chart for each fuel type
+                                  Center(
+                                    child: CustomLineChartDaily(dailyData: fuelData), // Use the dynamically passed fuelData
+                                  ),
                                 ],
                               ),
                             );
@@ -285,6 +303,8 @@ class _ListingScreenState extends State<ListingScreen> with TickerProviderStateM
                         ],
                       ),
                     ),
+
+
 
                     // Weekly Graph
                     SingleChildScrollView(

@@ -317,12 +317,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 TextSpan(
                   children: [
                     TextSpan(
-                      text: "$liters",
+                      text: "${liters.toStringAsFixed(2)}",
                       style: AppColors.subtitleStyle.copyWith(
-                        fontSize: 20.sp,
+                        fontSize: liters.toStringAsFixed(2).length > 6 ? 18.sp : 15.sp,
                         color: AppColors.primaryTextColor,
                       ),
                     ),
+
+
                     TextSpan(
                       text: " ltr",
                       style: AppColors.subtitleStyle.copyWith(
@@ -351,9 +353,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 TextSpan(
                   children: [
                     TextSpan(
-                      text: formatPrice(price),
-                      style: AppColors.headingStyle.copyWith(
-                        fontSize: 16.sp,
+                      text:
+                    '${price.toStringAsFixed(2)}',
+                      style: AppColors.subtitleStyle.copyWith(
+                        fontSize: liters.toStringAsFixed(2).length > 6 ? 13.sp : 15.sp,
                         color: AppColors.primaryTextColor,
                       ),
                     ),

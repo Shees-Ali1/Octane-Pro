@@ -8,6 +8,7 @@ import 'package:octane_pro/GetxControllers/Sale-Controller/SaleSummaryController
 
 import 'GetxControllers/Sale-Controller/FuelDataController.dart';
 import 'GetxControllers/dataController.dart';
+import 'GetxControllers/graphController.dart';
 import 'Screens/Auth/login_page.dart';
 import 'Screens/Auth/splash_screen.dart';
 import 'Screens/HomePage/home_Page.dart';
@@ -19,6 +20,7 @@ void main() async {
   Get.put(DataController());
   // Get.put(SaleSummaryController());
   Get.put(FuelDataController());
+  Get.put(GraphDataController());
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
