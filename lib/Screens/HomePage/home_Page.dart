@@ -9,6 +9,8 @@ import 'package:octane_pro/untils/assetImages.dart';
 import 'package:octane_pro/untils/utils.dart';
 import 'dart:math' as math;
 
+import '../../GetxControllers/Sale-Controller/FuelDataController.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -24,12 +26,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // New Animation for Sale Summary
   late AnimationController _summaryController;
   late Animation<double> _scaleAnimation;
-  final SaleSummaryController saleSummaryController =
-      Get.put(SaleSummaryController());
+  final FuelDataController _fuelDataController =
+      Get.put(FuelDataController());
   @override
   void initState() {
     super.initState();
-    saleSummaryController.listenForSaleSummary();
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
@@ -62,11 +64,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  List<Map<String, dynamic>> fuelData = [
-    {"type": "Petrol", "liter": 2200, "price": 1234567},
-    {"type": "Diesel", "liter": 1500, "price": 1234567},
-    {"type": "HOBC", "liter": 1800, "price": 1234567},
-  ];
+
 
   final List<Map<String, dynamic>> fuelStockData = [
     {"type": "Petrol", "liter": 2200, "price": 1234.56, "progress": 0.9},
@@ -120,131 +118,43 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
                 // SALE SUMMARY
                 // SALE SUMMARY
-                ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Container(
-                    padding: EdgeInsets.all(7),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [
-                          Color.fromRGBO(30, 31, 35, 1),
-                          Color.fromRGBO(9, 10, 10, 1),
-                        ],
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          "Sale Summary",
-                          style: AppColors.headingStyle.copyWith(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.summryRed,
-                          ),
-                        ),
-                        SizedBox(height: 12.h),
-                        Column(
-                          children: [
-                            // Define your static data for the sale summary
-                            {'type': 'Petrol', 'liters': 1200.0, 'price': 85000.0},
-                            {'type': 'Diesel', 'liters': 900.0, 'price': 75000.0},
-                            {'type': 'Hobc', 'liters': 300.0, 'price': 30000.0},
-                          ].map((fuel) {
-                            return Padding(
-                              padding: EdgeInsets.only(bottom: 10.h),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Text(
-                                      fuel['type'] as String,
-                                      textAlign: TextAlign.center,
-                                      style: AppColors.small.copyWith(
-                                        fontSize: 16.sp,
-                                        color: AppColors.primaryTextColor,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 97.w,
-                                    height: 33.h,
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        bottomLeft: Radius.circular(10),
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: Text.rich(
-                                        TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: "${fuel['liters']}",
-                                              style: AppColors.subtitleStyle.copyWith(
-                                                fontSize: 20.sp,
-                                                color: AppColors.primaryTextColor,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: " ltr",
-                                              style: AppColors.subtitleStyle.copyWith(
-                                                fontSize: 10.sp,
-                                                color: AppColors.primaryTextColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 7.w),
-                                  Container(
-                                    width: 101.w,
-                                    height: 33.h,
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(10),
-                                        bottomRight: Radius.circular(10),
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: Text.rich(
-                                        TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: formatPrice(fuel['price'] as double),
-                                              style: AppColors.headingStyle.copyWith(
-                                                fontSize: 16.sp,
-                                                color: AppColors.primaryTextColor,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: " rs.",
-                                              style: AppColors.small.copyWith(
-                                                fontSize: 10.sp,
-                                                color: AppColors.primaryTextColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 20.w),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ],
+          ScaleTransition(
+            scale: _scaleAnimation, // Assuming _scaleAnimation is defined elsewhere in your widget tree
+            child: Container(
+              padding: EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Color.fromRGBO(30, 31, 35, 1),
+                    Color.fromRGBO(9, 10, 10, 1),
+                  ],
+                ),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    "Sale Summary",
+                    style: AppColors.headingStyle.copyWith(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.summryRed,
                     ),
                   ),
-                ),
+                  SizedBox(height: 12.h),
+                  Column(
+                    children: [
+                      // Petrol summary
+                      _buildFuelSummary('Petrol', _fuelDataController),
+                      _buildFuelSummary('Diesel', _fuelDataController),
+                      _buildFuelSummary('HOBC', _fuelDataController),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
 
 
                 SizedBox(height: 10.h),
@@ -259,24 +169,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 SizedBox(height: 8.h),
                 FuelDashboard(),
-                // Center(
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     children: fuelStockData.map((fuel) {
-                //       return Expanded(
-                //         child: Padding(
-                //           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                //           child: MyCircularContainer(
-                //             progressValue: fuel["progress"]?.toDouble() ?? 0.0,
-                //             petrolLiter: fuel["liter"]?.toInt() ?? 0,
-                //             petrolPrice: fuel["price"]?.toDouble() ?? 0.0,
-                //             fuelType: fuel["type"] ?? '',
-                //           ),
-                //         ),
-                //       );
-                //     }).toList(),
-                //   ),
-                // ),
+
 
                 SizedBox(height: 31.h),
 
@@ -377,6 +270,112 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
     );
   }
+  // Helper widget to build a StreamBuilder for each fuel type
+  Widget _buildFuelSummary(String type, FuelDataController controller) {
+    double liters = 0.0;
+    double price = 0.0;
+
+    if (type == 'Petrol') {
+      liters = controller.totalLitersPetrol;
+      price = controller.totalAmountPetrol;
+    } else if (type == 'Diesel') {
+      liters = controller.totalLitersDiesel;
+      price = controller.totalAmountDiesel;
+    } else if (type == 'HOBC') {
+      liters = controller.totalLitersHOBC;
+      price = controller.totalAmountHOBC;
+    }
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              type,
+              textAlign: TextAlign.center,
+              style: AppColors.small.copyWith(
+                fontSize: 16.sp,
+                color: AppColors.primaryTextColor,
+              ),
+            ),
+          ),
+          Container(
+            width: 97.w,
+            height: 33.h,
+            decoration: BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                bottomLeft: Radius.circular(10),
+              ),
+            ),
+            child: Center(
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "$liters",
+                      style: AppColors.subtitleStyle.copyWith(
+                        fontSize: 20.sp,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                    TextSpan(
+                      text: " ltr",
+                      style: AppColors.subtitleStyle.copyWith(
+                        fontSize: 10.sp,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 7.w),
+          Container(
+            width: 101.w,
+            height: 33.h,
+            decoration: BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(10),
+                bottomRight: Radius.circular(10),
+              ),
+            ),
+            child: Center(
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: formatPrice(price),
+                      style: AppColors.headingStyle.copyWith(
+                        fontSize: 16.sp,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                    TextSpan(
+                      text: " rs.",
+                      style: AppColors.small.copyWith(
+                        fontSize: 10.sp,
+                        color: AppColors.primaryTextColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 20.w),
+        ],
+      ),
+    );
+  }
+
+
 }
 
 class AnimatedFuelWidget extends StatefulWidget {
@@ -617,89 +616,3 @@ class FuelDashboard extends StatelessWidget {
     );
   }
 }
-// class MyCircularContainer extends StatelessWidget {
-//   final double progressValue; // Example progress value
-//   final int petrolLiter; // Example petrol liter
-//   final double petrolPrice; // Example petrol price
-//   final String fuelType; // Fuel type
-//
-//   MyCircularContainer({
-//     required this.progressValue,
-//     required this.petrolLiter,
-//     required this.petrolPrice,
-//     required this.fuelType,
-//   });
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: Get.width,
-//       child: Center(
-//         child: Container(
-//           width: 150.w,
-//           height: 150.h,
-//           decoration: BoxDecoration(
-//             shape: BoxShape.circle,
-//             color: Color.fromRGBO(42, 42, 42, 1),
-//           ),
-//           child: Center(
-//             child: Container(
-//               width: 120.w,
-//               height: 120.h,
-//               decoration: BoxDecoration(
-//                 shape: BoxShape.circle,
-//                 color: Color.fromRGBO(55, 55, 55, 1),
-//               ),
-//               child: Center(
-//                 child: Stack(
-//                   children: [
-//                     Center(
-//                       child: Column(
-//                         mainAxisAlignment: MainAxisAlignment.center,
-//                         children: [
-//                           Text(
-//                             fuelType,
-//                             style: AppColors.headingStyle.copyWith(
-//                               color: Colors.white,
-//                               fontSize: 14.sp,
-//                             ),
-//                           ),
-//                           Text(
-//                             "$petrolLiter ltr",
-//                             style: AppColors.subtitleStyle.copyWith(
-//                               color: Colors.white,
-//                               fontSize: 12.sp,
-//                             ),
-//                           ),
-//                           Text(
-//                             "${petrolPrice.toStringAsFixed(2)} rs",
-//                             style: AppColors.small.copyWith(
-//                               color: Colors.white,
-//                               fontSize: 10.sp,
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     Center(
-//                       child: Container(
-//                         width: 84.w,
-//                         height: 84.w,
-//                         child: CircularProgressIndicator(
-//                           value: progressValue.isNaN ? 0.0 : progressValue, // Prevent NaN
-//                           backgroundColor: Colors.transparent,
-//                           valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-//                           strokeWidth: 4,
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
