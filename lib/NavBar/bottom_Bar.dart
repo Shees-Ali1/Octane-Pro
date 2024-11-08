@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:octane_pro/Screens/total_sales/total_sales_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import '../Screens/Details/Details.dart';
 import '../Screens/Details/realData.dart';
@@ -25,6 +26,7 @@ class _BottomNavState extends State<BottomNav> {
       HomePage(),
       ListingScreen(), // Replace with actual screens
       DetailsScreen(),
+      TotalSalesScreen(),
       ProfilePage(),
     ];
   }
@@ -80,9 +82,17 @@ class _BottomNavState extends State<BottomNav> {
         activeColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
+        icon: Icon(
+          Icons.table_chart,
+          size: 30,
+          color:  _selectedIndex == 3 ?Color.fromRGBO(255, 62, 71, 1) : Colors.grey,),
+        activeColorSecondary: Color.fromRGBO(255, 62, 71, 1),
+        activeColorPrimary: Colors.grey,
+      ),
+      PersistentBottomNavBarItem(
         icon: ColorFiltered(
           colorFilter: ColorFilter.mode(
-            _selectedIndex == 3 ?Color.fromRGBO(255, 62, 71, 1) : Colors.grey,
+            _selectedIndex == 4 ?Color.fromRGBO(255, 62, 71, 1) : Colors.grey,
             BlendMode.srcIn,
           ),
           child: SvgPicture.asset(

@@ -48,6 +48,7 @@ dependencies:
   cloud_firestore:
   sensors_plus:
   firebase_auth:
+  infinite_scroll_pagination: ^4.0.0
 
 
 dev_dependencies:

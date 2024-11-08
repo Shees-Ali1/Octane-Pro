@@ -5,6 +5,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:octane_pro/GetxControllers/AuthController.dart';
 import 'package:octane_pro/GetxControllers/Sale-Controller/SaleSummaryController.dart';
+import 'package:octane_pro/GetxControllers/Sale-Controller/table_data_controller.dart';
+import 'package:octane_pro/NavBar/bottom_Bar.dart';
+import 'package:octane_pro/Screens/total_sales/total_sales_screen.dart';
 
 import 'GetxControllers/dataController.dart';
 import 'Screens/Auth/login_page.dart';
@@ -17,6 +20,7 @@ void main() async {
   Get.put(Authcontroller());
   Get.put(DataController());
   Get.put(SaleSummaryController());
+  Get.put(TableDataController());
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
@@ -38,7 +42,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
         ),
-        home: SplashScreen(),
+        home: BottomNav(),
       ),
     );
   }

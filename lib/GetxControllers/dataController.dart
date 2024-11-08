@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 class DataController extends GetxController {
   final DatabaseReference _databaseReference = FirebaseDatabase.instance.ref();
   var latestData = <String, dynamic>{}.obs;
+  RxInt totalUnits = 0.obs;
 
   @override
   void onInit() {
