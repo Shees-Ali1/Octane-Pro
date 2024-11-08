@@ -43,6 +43,7 @@ dependencies:
   fl_chart: ^0.69.0
   animations: ^2.0.11
   firebase_database:
+  shared_preferences:
   firebase_core:
   http:
   cloud_firestore:

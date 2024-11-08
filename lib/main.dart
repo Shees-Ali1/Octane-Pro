@@ -9,6 +9,7 @@ import 'package:octane_pro/GetxControllers/Sale-Controller/table_data_controller
 import 'package:octane_pro/NavBar/bottom_Bar.dart';
 
 import 'GetxControllers/Sale-Controller/FuelDataController.dart';
+import 'GetxControllers/Sale-Controller/table_data_controller.dart';
 import 'GetxControllers/dataController.dart';
 import 'GetxControllers/graphController.dart';
 import 'Screens/Auth/login_page.dart';
@@ -24,6 +25,7 @@ void main() async {
   // Get.put(SaleSummaryController());
   Get.put(FuelDataController());
   Get.put(GraphDataController());
+  Get.put(TableDataController());
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
@@ -45,7 +47,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
         ),
-        home: BottomNav(),
+        home: SplashScreen(),
       ),
     );
   }
