@@ -79,6 +79,7 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
                 SizedBox(height: 20),
                 GestureDetector(
                   onTap: () async{
+                    tableVM.time.value = '';
                     tableVM.startTime.value = dataVM.shift1[0]['start']!;
                     tableVM.endTime.value = dataVM.shift1[0]['end']!;                  },
                   child: Container(
@@ -105,6 +106,7 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
                 SizedBox(height: 15,),
                 GestureDetector(
                   onTap: () async{
+                    tableVM.time.value = '';
                     tableVM.startTime.value = dataVM.shift2[0]['start']!;
                     tableVM.endTime.value = dataVM.shift2[0]['end']!;
                     // var endTime = await showTimeOnlyPicker(context: context);
@@ -161,8 +163,9 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
   Widget _buildTimeButton(String shiftValue, String label) {
     return GestureDetector(
       onTap: () {
-        tableVM.shift.value = '';
         tableVM.time.value = shiftValue;
+        tableVM.startTime.value = '';
+        tableVM.endTime.value = '';
       },
       child: Obx(() => Container(
         margin: EdgeInsets.only(right: 12),

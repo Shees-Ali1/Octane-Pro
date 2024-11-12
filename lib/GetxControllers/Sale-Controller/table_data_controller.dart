@@ -47,6 +47,51 @@ class TableDataController extends GetxController {
     hasMore.value = true;
   }
 
+// Updated _parseTime function to handle AM/PM time format
+  DateTime _parseTime(String timeString, DateTime currentTime) {
+    DateTime parsedTime;
+
+    try {
+      // Check if the timeString is in "AM/PM" format or "24-hour" format
+      if (timeString.contains("AM") || timeString.contains("PM")) {
+        // Convert the time from "AM/PM" format to "24-hour" format
+        timeString = _convertTimeTo24Hour(timeString);
+      }
+
+      // Define the format of the time string (24-hour format)
+      final timeFormat = DateFormat('HH:mm');
+
+      // Parse the time string into a DateTime object, with today's date and the given time
+      parsedTime = timeFormat.parse(timeString);
+
+      // Return a new DateTime object with the same date as currentTime and the parsed time
+      return DateTime(
+        currentTime.year,
+        currentTime.month,
+        currentTime.day,
+        parsedTime.hour,
+        parsedTime.minute,
+      );
+    } catch (e) {
+      throw FormatException("Invalid time format: $timeString");
+    }
+  }
+
+// Helper function to convert "08:00 AM" or "05:30 PM" to 24-hour format "08:00" or "17:30"
+  String _convertTimeTo24Hour(String time) {
+    try {
+      // Parse the time in AM/PM format
+      final format = DateFormat("hh:mm a");
+      final dateTime = format.parse(time);
+
+      // Convert it to 24-hour format
+      return DateFormat("HH:mm").format(dateTime);
+    } catch (e) {
+      throw FormatException("Invalid AM/PM time format: $time");
+    }
+  }
+
+// Updated fetchSalesDataWithFilters function
   Future<void> fetchSalesDataWithFilters() async {
     if (isLoading.value || !hasMore.value) return;
 
@@ -56,23 +101,27 @@ class TableDataController extends GetxController {
     DateTime? startTimeFilter;
     DateTime? endTimeFilter;
 
-    // Get the time filter value directly from the controller
     String timeFilterValue = time.value;
-
-    // Debug: Print the current time and the time filter value
-    print("Current Time: $currentTime");
     print("Time Filter Value: $timeFilterValue");
 
-    // Parse the startTime and endTime RxString values into DateTime for the current day
     if (startTime.value.isNotEmpty && endTime.value.isNotEmpty) {
       startTimeFilter = _parseTime(startTime.value, currentTime);
       endTimeFilter = _parseTime(endTime.value, currentTime);
-
-      // Debug: Print the parsed start and end time for the current day
       print("Parsed Start Time: $startTimeFilter");
       print("Parsed End Time: $endTimeFilter");
+
+      // Handling time span over two days (e.g., 6 PM to 8 AM)
+      if (startTimeFilter.isAfter(endTimeFilter)) {
+        // If start time is after end time, adjust the end time to the next day
+        endTimeFilter = endTimeFilter.add(Duration(days: 1));
+      }
+
+      // If the current time is outside the defined range, show data from the previous day
+      if (currentTime.isBefore(startTimeFilter) || currentTime.isAfter(endTimeFilter)) {
+        startTimeFilter = startTimeFilter.subtract(Duration(days: 1));
+        endTimeFilter = endTimeFilter.subtract(Duration(days: 1));
+      }
     } else if (timeFilterValue.isNotEmpty) {
-      // If no startTime or endTime are provided, use time filter values
       switch (timeFilterValue) {
         case "12 hours":
           startTimeFilter = currentTime.subtract(Duration(hours: 12));
@@ -84,21 +133,17 @@ class TableDataController extends GetxController {
           startTimeFilter = currentTime.subtract(Duration(days: 7));
           break;
         case "Month":
-          startTimeFilter = currentTime.subtract(Duration(days: 30));  // Approximate month
+          startTimeFilter = currentTime.subtract(Duration(days: 30));
           break;
         default:
-          startTimeFilter = currentTime.subtract(Duration(days: 1));  // Default to 1 day
+          startTimeFilter = currentTime.subtract(Duration(days: 1));
           break;
       }
       endTimeFilter = currentTime;
       print("Applied Time Filter: Start Time = $startTimeFilter, End Time = $endTimeFilter");
-    } else {
-      // No filtering if both startTimeFilter and endTimeFilter are null
-      startTimeFilter = null;
-      endTimeFilter = null;
     }
 
-    // Build the base query to fetch data from Firestore
+    // Query for fetching data from Firestore
     Query query = FirebaseFirestore.instance
         .collection("sales")
         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -116,21 +161,14 @@ class TableDataController extends GetxController {
 
       print("Fetched ${snapshot.docs.length} documents from Firestore.");
 
-      // Filter data based on the selected startTime and endTime, allowing the time range to span across two dates
       final filteredData = snapshot.docs.where((doc) {
         final timestamp = (doc['timestamp'] as Timestamp).toDate();
 
         bool isValidTime = true;
+
+        // If startTime and endTime filters are applied, check if the timestamp falls within the range
         if (startTimeFilter != null && endTimeFilter != null) {
-          if (startTimeFilter.isBefore(endTimeFilter)) {
-            // Standard range within the same day
-            isValidTime = timestamp.isAfter(startTimeFilter) && timestamp.isBefore(endTimeFilter) &&
-                _isSameDay(timestamp, startTimeFilter);
-          } else {
-            // Overnight range (e.g., 6 PM to 8 AM the next day)
-            isValidTime = (timestamp.isAfter(startTimeFilter) || timestamp.isBefore(endTimeFilter)) &&
-                (_isSameDay(timestamp, startTimeFilter) || _isSameDay(timestamp, endTimeFilter));
-          }
+          isValidTime = timestamp.isAfter(startTimeFilter!) && timestamp.isBefore(endTimeFilter!);
         }
 
         return isValidTime;
@@ -138,14 +176,10 @@ class TableDataController extends GetxController {
 
       print("Filtered ${filteredData.length} documents based on the time range.");
 
-      // Add the filtered data to the salesData list
       salesData.addAll(filteredData);
       salesData.refresh();
 
-      // Calculate totals by fuel type
       totalsByFuelType.value = calculateTotalByFuelType();
-
-      // Calculate total amount for each fuel type
       calculateTotalAmountForFuelType(filteredData, timeFilterValue, startTimeFilter, endTimeFilter);
       calculateTotalAmountAndLitersForNozzles(filteredData, timeFilterValue, startTimeFilter, endTimeFilter);
 
@@ -161,25 +195,6 @@ class TableDataController extends GetxController {
     isLoading.value = false;
   }
 
-// Helper function to check if two DateTime objects fall on the same day
-  bool _isSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year &&
-        date1.month == date2.month &&
-        date1.day == date2.day;
-  }
-
-// Helper function to parse time strings (e.g., "08:00 AM") into DateTime objects for today
-  DateTime _parseTime(String timeString, DateTime currentDate) {
-    final parsedTime = DateTime.parse("${currentDate.toLocal().toIso8601String().split('T')[0]} ${_convertTimeTo24Hour(timeString)}");
-    return parsedTime;
-  }
-
-// Helper function to convert "08:00 AM" or "05:30 PM" to 24-hour format "08:00" or "17:30"
-  String _convertTimeTo24Hour(String time) {
-    final format = DateFormat("hh:mm a");
-    final dateTime = format.parse(time);
-    return DateFormat("HH:mm").format(dateTime);
-  }
 
   void calculateTotalAmountForFuelType(List<QueryDocumentSnapshot> filteredData, String timeFilterValue, DateTime? startTimeFilter, DateTime? endTimeFilter) {
     DateTime currentTime = DateTime.now();
