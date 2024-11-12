@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import 'package:octane_pro/CustomWidgets/CustomInputField.dart';
 import 'package:octane_pro/CustomWidgets/custom_flChart-week.dart';
@@ -336,8 +337,8 @@ class _DetailsScreenState extends State<DetailsScreen>
                           ),
                           Obx(()=> dataController.totalUnits.value == 0 // Show loading indicator if nozzleCount is not fetched yet
                               ? Center(child: CircularProgressIndicator(color: Colors.red,))
-                              : StreamBuilder<Map<int, Map<String, dynamic>>>(
-                            stream: getLatestSalesStream(dataController.totalUnits.value),
+                              : StreamBuilder(
+                            stream: FirebaseFirestore.instance.collection("sales").doc(FirebaseAuth.instance.currentUser!.uid).collection("station1_nozzles").snapshots(),
                             builder: (context, salesSnapshot) {
                               if (salesSnapshot.connectionState == ConnectionState.waiting) {
                                 return Center(child: CircularProgressIndicator(color: Colors.red));
@@ -349,11 +350,8 @@ class _DetailsScreenState extends State<DetailsScreen>
                                 )));
                               }
 
-                              Map<int, Map<String, dynamic>> salesData = salesSnapshot.data ?? {};
+                              var salesData = salesSnapshot.data!.docs;
 
-                              // Sort salesData by unitNumber
-                              List<int> sortedUnitNumbers = salesData.keys.toList()
-                                ..sort((a, b) => a.compareTo(b)); // Sort keys by unitNumber
 
                               return Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -368,17 +366,19 @@ class _DetailsScreenState extends State<DetailsScreen>
                                     crossAxisSpacing: 14,
                                     mainAxisSpacing: 16,
                                   ),
-                                  itemCount: dataController.totalUnits.value,
+                                  itemCount: salesData.length,
                                   itemBuilder: (context, index) {
-                                    int unitNumber = sortedUnitNumbers[index]; // Get unitNumber from sorted list
-                                    var unitData = salesData[unitNumber]!;
+                                     // Get unitNumber from sorted list
+                                    var unitData = salesData[index];
+
+                                    print(unitData["expenses"]);
 
                                     return FuelCard(
-                                      fuelType: unitData['fuelType'] ?? "Petrol",
-                                      price: unitData['amount'].toString(),
-                                      sale: unitData['fuelType'] == "N/A" ? "N/A" : unitData['fuelType'] == "Petrol" ? "249.95" : "255.56",
-                                      liters: unitData['liters'],
-                                      unitNumber: unitData['unitNumber'],
+                                      fuelType: unitData['expenses'][0]['fuelType'] ,
+                                      price: unitData['expenses'][0]['amount'].toString(),
+                                      sale: unitData['expenses'][0]['litreRate'],
+                                      liters: unitData['expenses'][0]['liters'],
+                                      unitNumber: unitData['expenses'][0]['unitNumber'],
                                     );
                                   },
                                 )
@@ -387,17 +387,16 @@ class _DetailsScreenState extends State<DetailsScreen>
                                   physics: NeverScrollableScrollPhysics(),
                                   itemCount: salesData.length,
                                   itemBuilder: (context, index) {
-                                    int unitNumber = sortedUnitNumbers[index]; // Get unitNumber from sorted list
-                                    var unitData = salesData[unitNumber]!;
+                                    var unitData = salesData[index];
 
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 10),
                                       child: FuelCard(
-                                        fuelType: unitData['fuelType'],
-                                        price: unitData['amount'].toString(),
-                                        sale: unitData['fuelType'] == "N/A" ? "N/A" : unitData['fuelType'] == "Petrol" ? "249.95" : "255.56",
-                                        liters: unitData['liters'],
-                                        unitNumber: unitData['unitNumber'],
+                                        fuelType: unitData['expenses'][0]['fuelType'],
+                                        price: unitData['expenses'][0]['amount'].toString(),
+                                        sale: unitData['expenses'][0]['litreRate'],
+                                        liters: unitData['expenses'][0]['liters'],
+                                        unitNumber: unitData['expenses'][0]['unitNumber'],
                                       ),
                                     );
                                   },
@@ -689,15 +688,15 @@ class FuelCard extends StatelessWidget {
           SizedBox(height: 5),
           _buildInfoRow(
               'Price',
-              price,
+              formatNumber(double.tryParse(price) ?? 0).toString(),
               true,
               BorderRadius.only(
                   topLeft: Radius.circular(10), topRight: Radius.circular(10))),
           _buildInfoRow(
-              'Sale', sale, false, BorderRadius.zero),
+              'Sale', formatNumber(double.tryParse(sale) ?? 0).toString(), false, BorderRadius.zero),
           _buildInfoRow(
               'Ltr',
-              liters,
+              formatNumber(double.tryParse(liters) ?? 0).toString(),
               true,
               BorderRadius.only(
                   bottomLeft: Radius.circular(10),
@@ -705,6 +704,11 @@ class FuelCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String formatNumber(double number) {
+    final formatter = NumberFormat('#,##0.00', 'en_US'); // Adjust format as needed
+    return formatter.format(number);
   }
 
   Widget _buildInfoRow(String label, String value, bool showRadius,

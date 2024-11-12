@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:octane_pro/GetxControllers/Sale-Controller/table_data_controller.dart';
 import 'package:octane_pro/Screens/total_sales/components/data_row.dart';
 
@@ -18,87 +19,172 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
       return AlertDialog(
         backgroundColor: Colors.black,
         contentPadding: EdgeInsets.zero,
-        content: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 14),
-          decoration: BoxDecoration(
-            color: Colors.black,
-            border: Border.all(width: 1.5, color: Colors.red),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text("Show by last:",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                    fontFamily: "Jost",
+        content: Obx(
+            ()=> Container(
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+            decoration: BoxDecoration(
+              color: Colors.black,
+              border: Border.all(width: 1.5, color: Colors.red),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text("Show by last:",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                      fontFamily: "Jost",
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  _buildTimeButton("12 hours", "12 hours"),
-                  _buildTimeButton("24 hours", "24 hours"),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    _buildTimeButton("12 hours", "12 hours"),
+                    _buildTimeButton("24 hours", "24 hours"),
 
-                ],
-              ),
-              SizedBox(height: 10,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  _buildTimeButton("Week", "Week"),
-                  _buildTimeButton("Month", "Month"),
-                ],
-              ),
-              SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text("Sort by:",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                    fontFamily: "Jost",
+                  ],
+                ),
+                SizedBox(height: 10,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    _buildTimeButton("Week", "Week"),
+                    _buildTimeButton("Month", "Month"),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text("Select shift:",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                      fontFamily: "Jost",
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  _buildShiftButton("A", "Shift A"),
-                  _buildShiftButton("B", "Shift B"),
-                ],
-              ),
-              SizedBox(height: 40),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildDialogButton(context, "Apply", () async {
+                SizedBox(height: 20),
+                if(tableVM.startTime.value == null)
+                GestureDetector(
+                  onTap: () async{
+                    tableVM.selectStartTime(context);
+                    // var startTime = await showTimeOnlyPicker(context: context);
+                    // print("Start time: $startTime");
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(right: 12),
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color:  Colors.black,
+                      border: Border.all(width: 1, color: Colors.red),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text("Select Start Time",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.red,
+                        fontFamily: "Jost",
+                      ),
+                    ),
+                  ),
+                ),
+                if(tableVM.startTime.value != null)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Start time:  ${tableVM.startTime.value!.format(context)}",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.red,
+                          fontFamily: "Jost",
+                        ),
+                      ),
+                      InkWell(
+                        onTap: (){
+                          tableVM.startTime.value = null;
+                        },
+                          child: Icon(Icons.close, size: 20, color: Colors.white,))
+                    ],
+                  ),
+                SizedBox(height: 15,),
+                if(tableVM.endTime.value == null)
+                GestureDetector(
+                  onTap: () async{
+                    tableVM.selectEndTime(context);
+                    // var endTime = await showTimeOnlyPicker(context: context);
+                    // print("end time: $endTime");
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(right: 12),
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color:  Colors.black,
+                      border: Border.all(width: 1, color: Colors.red),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text("Select Start Time",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.red,
+                        fontFamily: "Jost",
+                      ),
+                    ),
+                  ),
+                ),
+                if(tableVM.endTime.value != null)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("End time:  ${tableVM.endTime.value!.format(context)}",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.red,
+                          fontFamily: "Jost",
+                        ),
+                      ),
+                      InkWell(
+                          onTap: (){
+                            tableVM.endTime.value = null;
+                          },
+                          child: Icon(Icons.close, size: 20, color: Colors.white,))
+                    ],
+                  ),
+                SizedBox(height: 40),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildDialogButton(context, "Apply", () async {
 
-                    if(tableVM.shift.value != ""){
+                        tableVM.applyFilter();
+
+                    }),
+                    _buildDialogButton(context, "Cancel", () {
+                      tableVM.shift.value = "";
+                      tableVM.startTime.value = null;
+                      tableVM.endTime.value = null;
+                      tableVM.time.value = "";
+                      Get.back();
                       tableVM.applyFilter();
-                    } else {
-                      tableVM.resetData();
-                      tableVM.fetchSalesDataWithTimeFilter(tableVM.time.value); // Fetch data from the last 12 hours
-                    }
-
-                  }),
-                  _buildDialogButton(context, "Cancel", () {
-                    tableVM.shift.value = "";
-                    tableVM.time.value = "";
-                    tableVM.resetData();
-                    tableVM.applyFilter();
-                  }),
-                ],
-              )
-            ],
+                    }),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       );
@@ -186,6 +272,8 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -210,7 +298,7 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
                 return NotificationListener<ScrollNotification>(
                   onNotification: (scrollInfo) {
                     if (!tableVM.isLoading.value && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-                      tableVM.fetchSalesData();
+                      tableVM.fetchSalesDataWithFilters();
                     }
                     return false;
                   },
@@ -231,6 +319,8 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
                 );
               }),
             ),
+            SizedBox(height: 20,),
+            Container(),
           ],
         ),
       ),
@@ -244,11 +334,11 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
       decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(14)),
       child: Row(
         children: [
-          _buildHeaderText("Date", 90),
-          _buildHeaderText("Nozzle", 60),
-          _buildHeaderText("Fuel", 50),
-          _buildHeaderText("Liters", 60),
-          _buildHeaderText("Total", 80),
+          _buildHeaderText("Date", MediaQuery.of(context).size.width * 0.21),
+          _buildHeaderText("Nozzle", MediaQuery.of(context).size.width * 0.17),
+          _buildHeaderText("Fuel", MediaQuery.of(context).size.width * 0.12),
+          _buildHeaderText("Liters", MediaQuery.of(context).size.width * 0.19),
+          _buildHeaderText("Total", MediaQuery.of(context).size.width * 0.25),
         ],
       ),
     );

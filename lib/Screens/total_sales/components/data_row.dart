@@ -16,7 +16,7 @@ class _TableDataRowState extends State<TableDataRow> {
   // Format Timestamp to desired date format
   String _formatDate(Timestamp timestamp) {
     DateTime dateTime = timestamp.toDate();
-    return DateFormat('yyyy-MM-dd\nhh:mm a').format(dateTime);
+    return DateFormat('dd MMM yyyy\nhh:mm a').format(dateTime);
   }
 
   @override
@@ -28,9 +28,9 @@ class _TableDataRowState extends State<TableDataRow> {
         child: Row(
           children: [
             SizedBox(
-              width: 90,
+              width: MediaQuery.of(context).size.width * 0.21,
               child: Text(
-                _formatDate(widget.date),
+                _formatDate(widget.date).toString(),
                 textAlign: TextAlign.center,
 
                 style: TextStyle(
@@ -42,9 +42,9 @@ class _TableDataRowState extends State<TableDataRow> {
               ),
             ),
             SizedBox(
-              width: 50,
+              width: MediaQuery.of(context).size.width * 0.17,
               child: Text(
-                widget.data[0]['unitNumber'],
+                widget.data[0]['unitNumber'].toString(),
                 textAlign: TextAlign.center,
 
                 style: TextStyle(
@@ -56,9 +56,22 @@ class _TableDataRowState extends State<TableDataRow> {
               ),
             ),
             SizedBox(
-              width: 50,
+              width: MediaQuery.of(context).size.width * 0.12,
               child: Text(
-                widget.data[0]['fuelType'],
+                widget.data[0]['fuelType'].toString(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Jost',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.19,
+              child: Text(
+                formatNumber(double.tryParse(widget.data[0]['liters'].toString() ?? "0") ?? 0),
                 textAlign: TextAlign.center,
 
                 style: TextStyle(
@@ -70,25 +83,10 @@ class _TableDataRowState extends State<TableDataRow> {
               ),
             ),
             SizedBox(
-              width: 60,
+              width: MediaQuery.of(context).size.width * 0.25,
               child: Text(
-                widget.data[0]['liters'],
+                formatNumber(double.tryParse(widget.data[0]['amount'].toString() ?? "0") ?? 0),
                 textAlign: TextAlign.center,
-
-                style: TextStyle(
-                  fontFamily: 'Jost',
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 80,
-              child: Text(
-                widget.data[0]['amount'],
-                textAlign: TextAlign.center,
-
                 style: TextStyle(
                   fontFamily: 'Jost',
                   fontSize: 12,
@@ -102,4 +100,9 @@ class _TableDataRowState extends State<TableDataRow> {
       ),
     );
   }
+}
+
+String formatNumber(double number) {
+  final formatter = NumberFormat('#,##0.00', 'en_US'); // Adjust format as needed
+  return formatter.format(number);
 }
