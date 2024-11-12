@@ -4,8 +4,10 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:octane_pro/CustomWidgets/custom_flChartDaily.dart';
 import 'package:octane_pro/GetxControllers/Sale-Controller/table_data_controller.dart';
+import 'package:octane_pro/GetxControllers/dataController.dart';
 import 'package:octane_pro/Screens/total_sales/components/data_row.dart';
 import 'package:octane_pro/Screens/total_sales/components/total_container.dart';
+import 'package:octane_pro/Screens/total_sales/total_nozzle_data.dart';
 
 class TotalSalesScreen extends StatefulWidget {
   TotalSalesScreen({super.key});
@@ -16,6 +18,7 @@ class TotalSalesScreen extends StatefulWidget {
 
 class _TotalSalesScreenState extends State<TotalSalesScreen> {
   final TableDataController tableVM = Get.find<TableDataController>();
+  final DataController dataVM = Get.find<DataController>();
 
   void showFilterDialog(BuildContext context) {
     showDialog(context: context, builder: (BuildContext context) {
@@ -74,57 +77,36 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-                if(tableVM.startTime.value == null)
                 GestureDetector(
                   onTap: () async{
-                    tableVM.selectStartTime(context);
-                    // var startTime = await showTimeOnlyPicker(context: context);
-                    // print("Start time: $startTime");
-                  },
+                    tableVM.startTime.value = dataVM.shift1[0]['start']!;
+                    tableVM.endTime.value = dataVM.shift1[0]['end']!;                  },
                   child: Container(
                     margin: EdgeInsets.only(right: 12),
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     height: 40,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color:  Colors.black,
+                      color: tableVM.startTime.value == dataVM.shift1[0]['start']! ? Colors.red : Colors.black,
                       border: Border.all(width: 1, color: Colors.red),
                     ),
                     alignment: Alignment.center,
-                    child: Text("Select Start Time",
+                    child: Text("${dataVM.shift1[0]['start']} to ${dataVM.shift1[0]['end']}",
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
-                        color: Colors.red,
+                        color: tableVM.startTime.value == dataVM.shift1[0]['start']! ? Colors.white : Colors.red,
                         fontFamily: "Jost",
                       ),
                     ),
                   ),
                 ),
-                if(tableVM.startTime.value != null)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Start time:  ${tableVM.startTime.value!.format(context)}",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.red,
-                          fontFamily: "Jost",
-                        ),
-                      ),
-                      InkWell(
-                        onTap: (){
-                          tableVM.startTime.value = null;
-                        },
-                          child: Icon(Icons.close, size: 20, color: Colors.white,))
-                    ],
-                  ),
+
                 SizedBox(height: 15,),
-                if(tableVM.endTime.value == null)
                 GestureDetector(
                   onTap: () async{
-                    tableVM.selectEndTime(context);
+                    tableVM.startTime.value = dataVM.shift2[0]['start']!;
+                    tableVM.endTime.value = dataVM.shift2[0]['end']!;
                     // var endTime = await showTimeOnlyPicker(context: context);
                     // print("end time: $endTime");
                   },
@@ -134,39 +116,20 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
                     height: 40,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color:  Colors.black,
+                      color: tableVM.startTime.value == dataVM.shift2[0]['start']! ? Colors.red : Colors.black,
                       border: Border.all(width: 1, color: Colors.red),
                     ),
                     alignment: Alignment.center,
-                    child: Text("Select Start Time",
+                    child: Text("${dataVM.shift2[0]['start']} to ${dataVM.shift2[0]['end']}",
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
-                        color: Colors.red,
+                        color:tableVM.startTime.value == dataVM.shift2[0]['start']! ? Colors.white : Colors.red,
                         fontFamily: "Jost",
                       ),
                     ),
                   ),
                 ),
-                if(tableVM.endTime.value != null)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("End time:  ${tableVM.endTime.value!.format(context)}",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.red,
-                          fontFamily: "Jost",
-                        ),
-                      ),
-                      InkWell(
-                          onTap: (){
-                            tableVM.endTime.value = null;
-                          },
-                          child: Icon(Icons.close, size: 20, color: Colors.white,))
-                    ],
-                  ),
                 SizedBox(height: 40),
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -174,12 +137,13 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
                     _buildDialogButton(context, "Apply", () async {
 
                         tableVM.applyFilter();
+                        Get.to(TotalNozzleData());
 
                     }),
                     _buildDialogButton(context, "Cancel", () {
                       tableVM.shift.value = "";
-                      tableVM.startTime.value = null;
-                      tableVM.endTime.value = null;
+                      tableVM.startTime.value = "";
+                      tableVM.endTime.value = "";
                       tableVM.time.value = "";
                       Get.back();
                       tableVM.applyFilter();
@@ -255,7 +219,7 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
       appBar: AppBar(
         foregroundColor: Colors.red,
         backgroundColor: Colors.black,
-        title: Text("Total Sales", style: TextStyle(color: Colors.red, fontSize: 24, fontWeight: FontWeight.w600)),
+        title: Text("Sales Record", style: TextStyle(color: Colors.red, fontSize: 24, fontWeight: FontWeight.w600)),
         actions: [
           IconButton(
             icon: Icon(Icons.tune, size: 30, color: Colors.red),
@@ -264,129 +228,109 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
         ],
       ),
       body: SafeArea(
-        child: Stack(
+        child: Column(
           children: [
-            Column(
-              children: [
-                // _buildTotalHeader(),
-                // SizedBox(height: 10,),
-                // Obx(
-                //     ()=> ListView.builder(
-                //       itemCount: tableVM.totalsByFuelType.length,
-                //       shrinkWrap: true,
-                //       padding: EdgeInsets.zero,
-                //       physics: NeverScrollableScrollPhysics(),
-                //       itemBuilder: (context, index){
-                //     return Padding(
-                //       padding:  EdgeInsets.only(bottom:index == 0 ? 8.0: 0, left: 10, right: 10),
-                //       child: Row(
-                //         children: [
-                //           SizedBox(
-                //             width: MediaQuery.of(context).size.width * 0.23,
-                //             child: Text(
-                //               tableVM.totalFilterData[index]['time'],
-                //               textAlign: TextAlign.center,
-                //               style: TextStyle(
-                //                 fontFamily: 'Jost',
-                //                 fontSize: 13,
-                //                 fontWeight: FontWeight.w500,
-                //                 color: Colors.white,
-                //               ),
-                //             ),
-                //           ),
-                //           SizedBox(
-                //             width: MediaQuery.of(context).size.width * 0.15,
-                //             child: Text(
-                //           tableVM.totalFilterData[index]['fuelType'],
-                //               textAlign: TextAlign.center,
-                //               style: TextStyle(
-                //                 fontFamily: 'Jost',
-                //                 fontSize: 13,
-                //                 fontWeight: FontWeight.w500,
-                //                 color: Colors.white,
-                //               ),
-                //             ),
-                //           ),
-                //           SizedBox(
-                //             width: MediaQuery.of(context).size.width * 0.27,
-                //             child: Text(
-                //               formatNumber(tableVM.totalFilterData[index]['totalLiters']),
-                //               textAlign: TextAlign.center,
-                //
-                //               style: TextStyle(
-                //                 fontFamily: 'Jost',
-                //                 fontSize: 13,
-                //                 fontWeight: FontWeight.w500,
-                //                 color: Colors.white,
-                //               ),
-                //             ),
-                //           ),
-                //           SizedBox(
-                //             width: MediaQuery.of(context).size.width * 0.29,
-                //             child: Text(
-                //               formatNumber(tableVM.totalFilterData[index]['totalAmount']),
-                //               textAlign: TextAlign.center,
-                //               style: TextStyle(
-                //                 fontFamily: 'Jost',
-                //                 fontSize: 13,
-                //                 fontWeight: FontWeight.w500,
-                //                 color: Colors.white,
-                //               ),
-                //             ),
-                //           ),
-                //         ],
-                //       ),
-                //     );
-                //   }),
-                // ),
-                _buildHeader(),
-                Expanded(
-                  child: Obx(() {
-                    return NotificationListener<ScrollNotification>(
-                      onNotification: (scrollInfo) {
-                        if (!tableVM.isLoading.value && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-                          tableVM.fetchSalesDataWithFilters();
-                        }
-                        return false;
-                      },
-                      child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        itemCount: tableVM.salesData.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index == tableVM.salesData.length) {
-                            return tableVM.isLoading.value
-                                ? Center(child: CircularProgressIndicator(color: Colors.red))
-                                : SizedBox.shrink();
-                          }
-                          final data = tableVM.salesData[index];
-                          List<Map<String, dynamic>> sales = List<Map<String, dynamic>>.from(data['expenses'].map((item) => Map<String, dynamic>.from(item)));
-                          return TableDataRow(data: sales, date: data['timestamp']);
-                        },
-                      ),
-                    );
-                  }),
-                ),
-                SizedBox(height: 20,),
-              ],
+            // _buildTotalHeader(),
+            // SizedBox(height: 10,),
+            // Obx(
+            //     ()=> ListView.builder(
+            //       itemCount: tableVM.totalsByFuelType.length,
+            //       shrinkWrap: true,
+            //       padding: EdgeInsets.zero,
+            //       physics: NeverScrollableScrollPhysics(),
+            //       itemBuilder: (context, index){
+            //     return Padding(
+            //       padding:  EdgeInsets.only(bottom:index == 0 ? 8.0: 0, left: 10, right: 10),
+            //       child: Row(
+            //         children: [
+            //           SizedBox(
+            //             width: MediaQuery.of(context).size.width * 0.23,
+            //             child: Text(
+            //               tableVM.totalFilterData[index]['time'],
+            //               textAlign: TextAlign.center,
+            //               style: TextStyle(
+            //                 fontFamily: 'Jost',
+            //                 fontSize: 13,
+            //                 fontWeight: FontWeight.w500,
+            //                 color: Colors.white,
+            //               ),
+            //             ),
+            //           ),
+            //           SizedBox(
+            //             width: MediaQuery.of(context).size.width * 0.15,
+            //             child: Text(
+            //           tableVM.totalFilterData[index]['fuelType'],
+            //               textAlign: TextAlign.center,
+            //               style: TextStyle(
+            //                 fontFamily: 'Jost',
+            //                 fontSize: 13,
+            //                 fontWeight: FontWeight.w500,
+            //                 color: Colors.white,
+            //               ),
+            //             ),
+            //           ),
+            //           SizedBox(
+            //             width: MediaQuery.of(context).size.width * 0.27,
+            //             child: Text(
+            //               formatNumber(tableVM.totalFilterData[index]['totalLiters']),
+            //               textAlign: TextAlign.center,
+            //
+            //               style: TextStyle(
+            //                 fontFamily: 'Jost',
+            //                 fontSize: 13,
+            //                 fontWeight: FontWeight.w500,
+            //                 color: Colors.white,
+            //               ),
+            //             ),
+            //           ),
+            //           SizedBox(
+            //             width: MediaQuery.of(context).size.width * 0.29,
+            //             child: Text(
+            //               formatNumber(tableVM.totalFilterData[index]['totalAmount']),
+            //               textAlign: TextAlign.center,
+            //               style: TextStyle(
+            //                 fontFamily: 'Jost',
+            //                 fontSize: 13,
+            //                 fontWeight: FontWeight.w500,
+            //                 color: Colors.white,
+            //               ),
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     );
+            //   }),
+            // ),
+            _buildHeader(),
+            Expanded(
+              child: Obx(() {
+                return NotificationListener<ScrollNotification>(
+                  onNotification: (scrollInfo) {
+                    if (!tableVM.isLoading.value && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+                      tableVM.fetchSalesDataWithFilters();
+                    }
+                    return false;
+                  },
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: tableVM.salesData.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == tableVM.salesData.length) {
+                        return tableVM.isLoading.value
+                            ? Center(child: CircularProgressIndicator(color: Colors.red))
+                            : SizedBox.shrink();
+                      }
+                      final data = tableVM.salesData[index];
+                      List<Map<String, dynamic>> sales = List<Map<String, dynamic>>.from(data['expenses'].map((item) => Map<String, dynamic>.from(item)));
+                      return TableDataRow(data: sales, date: data['timestamp']);
+                    },
+                  ),
+                );
+              }),
             ),
-            Positioned(
-              bottom: 14,
-              child: SizedBox(
-              height: 130,
-              width: MediaQuery.of(context).size.width,
-              child: Obx(
-                  ()=> ListView.builder(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: tableVM.totalFilterData.length,
-                    itemBuilder: (context, index){
-                  return TotalContainer(data: tableVM.totalFilterData[index]);
-                }),
-              ),
-            ))
+            SizedBox(height: 20,),
           ],
-        )
+        ),
       ),
     );
   }

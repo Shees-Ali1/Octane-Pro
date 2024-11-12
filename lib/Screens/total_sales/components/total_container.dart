@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TotalContainer extends StatefulWidget {
-  const TotalContainer({super.key, required this.data});
+  const TotalContainer({super.key, required this.data, this.nozzleID});
 
   final Map<String, dynamic> data;
+  final String? nozzleID;
 
   @override
   State<TotalContainer> createState() => _TotalContainerState();
@@ -14,7 +15,7 @@ class _TotalContainerState extends State<TotalContainer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 130,
+      height: widget.nozzleID != null ? 150 : 130,
       width: MediaQuery.of(context).size.width * .9,
       padding: EdgeInsets.symmetric(horizontal: 8),
       margin: EdgeInsets.symmetric(horizontal: 10),
@@ -44,6 +45,18 @@ class _TotalContainerState extends State<TotalContainer> {
           Align(
             alignment: Alignment.centerLeft,
             child: Text("Time: ${widget.data['time']}",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontFamily: "Jost",
+              ),
+            ),
+          ),
+          if(widget.nozzleID != null)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text("Nozzle: ${widget.data['unitNumber']}",
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,

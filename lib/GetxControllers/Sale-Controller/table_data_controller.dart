@@ -3,14 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class TableDataController extends GetxController {
   RxString shift = "".obs;
   RxString time = "".obs;
-  var startTime = Rx<TimeOfDay?>(null);  // Initially null
-  var endTime = Rx<TimeOfDay?>(null);    // Initially null
+  var startTime = "".obs;  // Initially null
+  var endTime = "".obs;    // Initially null
   RxList<QueryDocumentSnapshot> salesData = <QueryDocumentSnapshot>[].obs;
   RxList<Map<String, dynamic>> totalFilterData = <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> allNozzlesData = <Map<String, dynamic>>[].obs;
   RxBool isLoading = false.obs;
   RxBool hasMore = true.obs;
   QueryDocumentSnapshot? lastDocument;
@@ -33,11 +35,14 @@ class TableDataController extends GetxController {
 
   void applyFilter() {
     resetData();  // Clear data and pagination state
+    Get.back();
     fetchSalesDataWithFilters();  // Fetch new data with the filter applied
   }
 
   void resetData() {
     salesData.clear();
+    totalFilterData.clear();
+    allNozzlesData.clear();
     lastDocument = null;
     hasMore.value = true;
   }
@@ -46,10 +51,10 @@ class TableDataController extends GetxController {
     if (isLoading.value || !hasMore.value) return;
 
     isLoading.value = true;
-    Get.back();
+
+    DateTime currentTime = DateTime.now();
     DateTime? startTimeFilter;
     DateTime? endTimeFilter;
-    DateTime currentTime = DateTime.now();
 
     // Get the time filter value directly from the controller
     String timeFilterValue = time.value;
@@ -58,43 +63,39 @@ class TableDataController extends GetxController {
     print("Current Time: $currentTime");
     print("Time Filter Value: $timeFilterValue");
 
-    // If startTime and endTime are selected, convert them to DateTime for comparison (ignoring the date)
-    if (startTime.value != null && endTime.value != null) {
-      startTimeFilter = DateTime(currentTime.year, currentTime.month, currentTime.day, startTime.value!.hour, startTime.value!.minute);
-      endTimeFilter = DateTime(currentTime.year, currentTime.month, currentTime.day, endTime.value!.hour, endTime.value!.minute);
-      // Debug: Print the selected startTime and endTime
-      print("Selected Start Time: $startTimeFilter");
-      print("Selected End Time: $endTimeFilter");
-    }
+    // Parse the startTime and endTime RxString values into DateTime for the current day
+    if (startTime.value.isNotEmpty && endTime.value.isNotEmpty) {
+      startTimeFilter = _parseTime(startTime.value, currentTime);
+      endTimeFilter = _parseTime(endTime.value, currentTime);
 
-    // If no startTime or endTime filters are provided, apply the time filter logic (timeFilterValue)
-    if (startTimeFilter == null || endTimeFilter == null) {
-      if (timeFilterValue.isNotEmpty) {
-        switch (timeFilterValue) {
-          case "12 hours":
-            startTimeFilter = currentTime.subtract(Duration(hours: 12));
-            break;
-          case "24 hours":
-            startTimeFilter = currentTime.subtract(Duration(hours: 24));
-            break;
-          case "Week":
-            startTimeFilter = currentTime.subtract(Duration(days: 7));
-            break;
-          case "Month":
-            startTimeFilter = currentTime.subtract(Duration(days: 30));  // Approximate month (30 days)
-            break;
-          default:
-            startTimeFilter = currentTime.subtract(Duration(days: 1));  // Default to 1 day if filter is unknown
-            break;
-        }
-        endTimeFilter = currentTime;  // If no end time is selected, assume it's the current time
-        // Debug: Print the applied time filter values
-        print("Applied Time Filter: Start Time = $startTimeFilter, End Time = $endTimeFilter");
-      } else {
-        // If timeFilterValue is empty, don't apply any time filtering
-        startTimeFilter = null;
-        endTimeFilter = null;
+      // Debug: Print the parsed start and end time for the current day
+      print("Parsed Start Time: $startTimeFilter");
+      print("Parsed End Time: $endTimeFilter");
+    } else if (timeFilterValue.isNotEmpty) {
+      // If no startTime or endTime are provided, use time filter values
+      switch (timeFilterValue) {
+        case "12 hours":
+          startTimeFilter = currentTime.subtract(Duration(hours: 12));
+          break;
+        case "24 hours":
+          startTimeFilter = currentTime.subtract(Duration(hours: 24));
+          break;
+        case "Week":
+          startTimeFilter = currentTime.subtract(Duration(days: 7));
+          break;
+        case "Month":
+          startTimeFilter = currentTime.subtract(Duration(days: 30));  // Approximate month
+          break;
+        default:
+          startTimeFilter = currentTime.subtract(Duration(days: 1));  // Default to 1 day
+          break;
       }
+      endTimeFilter = currentTime;
+      print("Applied Time Filter: Start Time = $startTimeFilter, End Time = $endTimeFilter");
+    } else {
+      // No filtering if both startTimeFilter and endTimeFilter are null
+      startTimeFilter = null;
+      endTimeFilter = null;
     }
 
     // Build the base query to fetch data from Firestore
@@ -113,34 +114,28 @@ class TableDataController extends GetxController {
     if (snapshot.docs.isNotEmpty) {
       lastDocument = snapshot.docs.last;
 
-      // Debug: Print the number of documents fetched
       print("Fetched ${snapshot.docs.length} documents from Firestore.");
 
-      // Filter data based on the selected startTime and endTime (only apply if not null)
+      // Filter data based on the selected startTime and endTime, allowing the time range to span across two dates
       final filteredData = snapshot.docs.where((doc) {
         final timestamp = (doc['timestamp'] as Timestamp).toDate();
 
-        // Debug: Print the timestamp for each document
-        print("Document Timestamp: $timestamp");
-
         bool isValidTime = true;
-
-        // If no startTime or endTime filter is applied, show all data
-        if (startTimeFilter == null && endTimeFilter == null) {
-          isValidTime = true;
-        } else if (startTimeFilter != null && endTimeFilter != null) {
-          // Apply time-based filtering if startTime and endTime are provided
-          DateTime strippedTimestamp = DateTime(currentTime.year, currentTime.month, currentTime.day, timestamp.hour, timestamp.minute);
-          DateTime strippedStartTimeFilter = DateTime(currentTime.year, currentTime.month, currentTime.day, startTimeFilter!.hour, startTimeFilter.minute);
-          DateTime strippedEndTimeFilter = DateTime(currentTime.year, currentTime.month, currentTime.day, endTimeFilter!.hour, endTimeFilter.minute);
-
-          isValidTime = strippedTimestamp.isAfter(strippedStartTimeFilter) && strippedTimestamp.isBefore(strippedEndTimeFilter);
+        if (startTimeFilter != null && endTimeFilter != null) {
+          if (startTimeFilter.isBefore(endTimeFilter)) {
+            // Standard range within the same day
+            isValidTime = timestamp.isAfter(startTimeFilter) && timestamp.isBefore(endTimeFilter) &&
+                _isSameDay(timestamp, startTimeFilter);
+          } else {
+            // Overnight range (e.g., 6 PM to 8 AM the next day)
+            isValidTime = (timestamp.isAfter(startTimeFilter) || timestamp.isBefore(endTimeFilter)) &&
+                (_isSameDay(timestamp, startTimeFilter) || _isSameDay(timestamp, endTimeFilter));
+          }
         }
 
         return isValidTime;
       }).toList();
 
-      // Debug: Print the number of filtered documents
       print("Filtered ${filteredData.length} documents based on the time range.");
 
       // Add the filtered data to the salesData list
@@ -150,55 +145,12 @@ class TableDataController extends GetxController {
       // Calculate totals by fuel type
       totalsByFuelType.value = calculateTotalByFuelType();
 
-      // Prepare the result list
+      // Calculate total amount for each fuel type
+      calculateTotalAmountForFuelType(filteredData, timeFilterValue, startTimeFilter, endTimeFilter);
+      calculateTotalAmountAndLitersForNozzles(filteredData, timeFilterValue, startTimeFilter, endTimeFilter);
 
-      // Create fuel data list based on totalsByFuelType
-      // Create fuel data list based on totalsByFuelType
-      totalsByFuelType.forEach((fuelType, totalLiters) {
-        double totalAmount = 0.0;
-
-        // Calculate total amount for this fuel type
-        for (var document in filteredData) {
-          if (document['expenses'][0]['fuelType'] == fuelType) {
-            totalAmount += double.tryParse(document['expenses'][0]['amount']) ?? 0.0;
-          }
-        }
-
-        String timePeriod = timeFilterValue.isEmpty ? "Overall" : timeFilterValue;
-
-        if (startTimeFilter != null && endTimeFilter != null) {
-          timePeriod = "${startTimeFilter!.hour}:${startTimeFilter.minute} to ${endTimeFilter!.hour}:${endTimeFilter.minute}";
-        } else if (startTimeFilter != null) {
-          timePeriod = "${startTimeFilter!.hour}:${startTimeFilter.minute} to ${currentTime.hour}:${currentTime.minute}";
-        }
-
-        // Find the index of the entry for this fuelType in the list, if exists
-        int index = totalFilterData.indexWhere((entry) => entry['fuelType'] == fuelType);
-
-        // Create new entry for the current fuel type
-        Map<String, dynamic> newData = {
-          'fuelType': fuelType,
-          'totalLiters': totalLiters,
-          'totalAmount': totalAmount,
-          'time': timePeriod,
-        };
-
-        // If the fuelType is already in the list, replace the existing entry
-        if (index != -1) {
-          totalFilterData[index] = newData;  // Replace the existing entry
-        } else {
-          // If the fuelType is not in the list, add it
-          totalFilterData.add(newData);
-        }
-      });
-
-
-      // Print the fuel data list
       print("Fuel Data List: $totalFilterData");
 
-      // You can use fuelDataList for your UI or further processing here
-
-      // Update hasMore based on the size of the fetched documents
       if (snapshot.docs.length < pageSize) {
         hasMore.value = false;
       }
@@ -208,6 +160,165 @@ class TableDataController extends GetxController {
 
     isLoading.value = false;
   }
+
+// Helper function to check if two DateTime objects fall on the same day
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
+// Helper function to parse time strings (e.g., "08:00 AM") into DateTime objects for today
+  DateTime _parseTime(String timeString, DateTime currentDate) {
+    final parsedTime = DateTime.parse("${currentDate.toLocal().toIso8601String().split('T')[0]} ${_convertTimeTo24Hour(timeString)}");
+    return parsedTime;
+  }
+
+// Helper function to convert "08:00 AM" or "05:30 PM" to 24-hour format "08:00" or "17:30"
+  String _convertTimeTo24Hour(String time) {
+    final format = DateFormat("hh:mm a");
+    final dateTime = format.parse(time);
+    return DateFormat("HH:mm").format(dateTime);
+  }
+
+  void calculateTotalAmountForFuelType(List<QueryDocumentSnapshot> filteredData, String timeFilterValue, DateTime? startTimeFilter, DateTime? endTimeFilter) {
+    DateTime currentTime = DateTime.now();
+
+    totalsByFuelType.forEach((fuelType, totalLiters) {
+      double totalAmount = 0.0;
+
+      // Calculate total amount for this fuel type
+      for (var document in filteredData) {
+        if (document['expenses'][0]['fuelType'] == fuelType) {
+          totalAmount += double.tryParse(document['expenses'][0]['amount']) ?? 0.0;
+        }
+      }
+
+      String timePeriod = timeFilterValue.isEmpty ? "Overall" : timeFilterValue;
+
+      if (startTimeFilter != null && endTimeFilter != null) {
+        timePeriod = "${startTimeFilter!.hour}:${startTimeFilter.minute} to ${endTimeFilter!.hour}:${endTimeFilter.minute}";
+      } else if (startTimeFilter != null) {
+        timePeriod = "${startTimeFilter!.hour}:${startTimeFilter.minute} to ${currentTime.hour}:${currentTime.minute}";
+      }
+
+      // Find the index of the entry for this fuelType in the list, if exists
+      int index = totalFilterData.indexWhere((entry) => entry['fuelType'] == fuelType);
+
+      String time_period = '';
+
+      if(startTime != "" && endTime != ""){
+        time_period = "${startTime.value} to ${endTime.value}";
+      } else if(startTime == "" && endTime == "" && time != '') {
+        time_period = time.value;
+      } else {
+        time_period = 'Overall';
+      }
+
+      // Create new entry for the current fuel type
+      Map<String, dynamic> newData = {
+        'fuelType': fuelType,
+        'totalLiters': totalLiters,
+        'totalAmount': totalAmount,
+        'time': time_period,
+      };
+
+      // If the fuelType is already in the list, replace the existing entry
+      if (index != -1) {
+        totalFilterData[index] = newData;  // Replace the existing entry
+      } else {
+        // If the fuelType is not in the list, add it
+        totalFilterData.add(newData);
+      }
+    });
+
+    // Optionally, you can print or use the totalFilterData list as needed
+    print("Total Amount by Fuel Type: $totalFilterData");
+  }
+
+  void calculateTotalAmountAndLitersForNozzles(List<QueryDocumentSnapshot> filteredData, String timeFilterValue, DateTime? startTimeFilter, DateTime? endTimeFilter) {
+    DateTime currentTime = DateTime.now();
+
+    // Clear the previous data in allNozzlesData
+    allNozzlesData.clear();
+
+    // Map to store the aggregated data for each nozzle
+    Map<String, Map<String, dynamic>> nozzleDataMap = {};
+
+    // Iterate over each document to calculate total liters and total amount per nozzle
+    filteredData.forEach((document) {
+      var expenses = document['expenses'];
+
+      expenses.forEach((expense) {
+        String nozzleId = expense['unitNumber']; // Assuming unitNumber is the nozzle identifier
+        String fuelType = expense['fuelType']; // Assuming unitNumber is the nozzle identifier
+        double liters = double.tryParse(expense['liters'].toString()) ?? 0.0;
+        double amount = double.tryParse(expense['amount'].toString()) ?? 0.0;
+
+        String timePeriod = timeFilterValue.isEmpty ? "Overall" : timeFilterValue;
+
+        if (startTimeFilter != null && endTimeFilter != null) {
+          timePeriod = "${startTimeFilter!.hour}:${startTimeFilter.minute} to ${endTimeFilter!.hour}:${endTimeFilter.minute}";
+        } else if (startTimeFilter != null) {
+          timePeriod = "${startTimeFilter!.hour}:${startTimeFilter.minute} to ${currentTime.hour}:${currentTime.minute}";
+        }
+
+        String time_period = '';
+
+
+        if(startTime != "" && endTime != ""){
+          time_period = "${startTime.value} to ${endTime.value}";
+        } else if(startTime == "" && endTime == "" && time != '') {
+          time_period = time.value;
+        } else {
+          time_period = 'Overall';
+        }
+
+
+        // Check if nozzle data already exists in the map
+        if (nozzleDataMap.containsKey(nozzleId)) {
+
+          nozzleDataMap[nozzleId]!['totalLiters'] += liters;
+          nozzleDataMap[nozzleId]!['totalAmount'] += amount;
+
+        } else {
+
+          nozzleDataMap[nozzleId] = {
+            'unitNumber': nozzleId,
+            'totalLiters': liters,
+            'totalAmount': amount,
+            'fuelType': fuelType,
+            'time': time_period,
+          };
+
+        }
+      });
+    });
+
+    // Convert the nozzleDataMap into a list and store it in allNozzlesData
+    allNozzlesData.value = nozzleDataMap.values.toList();
+
+    // Optionally, you can print or use the allNozzlesData list as needed
+    print("Total Amount and Liters by Nozzle: ${allNozzlesData.value}");
+  }
+
+  String formatTimePeriod(DateTime? startTime, DateTime? endTime) {
+    String formatTime(DateTime time) {
+      int hour = time.hour;
+      String period = hour >= 12 ? 'PM' : 'AM';
+      hour = hour % 12;
+      if (hour == 0) hour = 12; // Convert 0 to 12 for 12-hour format
+      return "${hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')} $period";
+    }
+
+    if (startTime != null && endTime != null) {
+      return "${formatTime(startTime)} to ${formatTime(endTime)}";
+    } else if (startTime != null) {
+      return "${formatTime(startTime)} to ${formatTime(DateTime.now())}";
+    }
+    return "Overall";
+  }
+
 
   double calculateTotalAmount() {
     double totalAmount = 0.0;
@@ -247,6 +358,27 @@ class TableDataController extends GetxController {
 
     return totalsByFuelType;
   }
+
+  Map<String, double> calculateTotalNozzleFuel() {
+    Map<String, double> totalsByFuelType = {};
+
+    for (var document in salesData) {
+      String fuelType = document['expenses'][0]['fuelType'];
+      String nozzleID = document['expenses'][0]['unitNumber'];
+      double liters = double.tryParse(document['expenses'][0]['liters']) ?? 0.0;
+
+
+      if (totalsByFuelType.containsKey(fuelType)) {
+        totalsByFuelType[fuelType] = (totalsByFuelType[fuelType] ?? 0.0) + liters;
+      } else {
+        totalsByFuelType[fuelType] = liters;
+      }
+
+    }
+
+    return totalsByFuelType;
+  }
+
 
 
 
@@ -298,62 +430,62 @@ class TableDataController extends GetxController {
   }
 
   // Method to select the start time
-  Future<void> selectStartTime(BuildContext context) async {
-    final TimeOfDay? selectedStartTime = await showTimeOnlyPicker(context: context, initialTime: TimeOfDay.now());
-
-    if (selectedStartTime != null) {
-      // Update the startTime Rx variable when the user selects a start time
-      startTime.value = selectedStartTime;
-      // Optionally show snackbar confirmation
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Start time selected: ${selectedStartTime.format(context)}")),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Start time selection canceled")),
-      );
-    }
-  }
-
-  // Method to select the end time with validation
-  Future<void> selectEndTime(BuildContext context) async {
-    if (startTime.value == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please select the start time first.")),
-      );
-      return;
-    }
-
-    TimeOfDay? selectedEndTime;
-    bool isValid = false;
-
-    // Loop until the user selects a valid end time
-    while (!isValid) {
-      selectedEndTime = await showTimeOnlyPicker(context: context, initialTime: startTime.value!);
-
-      if (selectedEndTime == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("End time selection canceled")),
-        );
-        return;
-      }
-
-      if (selectedEndTime.hour < startTime.value!.hour ||
-          (selectedEndTime.hour == startTime.value!.hour && selectedEndTime.minute <= startTime.value!.minute)) {
-        // Show error if end time is before start time
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("End time cannot be before start time. Please select a valid end time.")),
-        );
-      } else {
-        // If the end time is valid, update the endTime Rx variable
-        endTime.value = selectedEndTime;
-        isValid = true;
-
-        // Optionally show snackbar confirmation
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("End time selected: ${selectedEndTime.format(context)}")),
-        );
-      }
-    }
-  }
+  // Future<void> selectStartTime(BuildContext context) async {
+  //   final TimeOfDay? selectedStartTime = await showTimeOnlyPicker(context: context, initialTime: TimeOfDay.now());
+  //
+  //   if (selectedStartTime != null) {
+  //     // Update the startTime Rx variable when the user selects a start time
+  //     startTime.value = selectedStartTime;
+  //     // Optionally show snackbar confirmation
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Start time selected: ${selectedStartTime.format(context)}")),
+  //     );
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Start time selection canceled")),
+  //     );
+  //   }
+  // }
+  //
+  // // Method to select the end time with validation
+  // Future<void> selectEndTime(BuildContext context) async {
+  //   if (startTime.value == null) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Please select the start time first.")),
+  //     );
+  //     return;
+  //   }
+  //
+  //   TimeOfDay? selectedEndTime;
+  //   bool isValid = false;
+  //
+  //   // Loop until the user selects a valid end time
+  //   while (!isValid) {
+  //     selectedEndTime = await showTimeOnlyPicker(context: context, initialTime: startTime.value!);
+  //
+  //     if (selectedEndTime == null) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text("End time selection canceled")),
+  //       );
+  //       return;
+  //     }
+  //
+  //     if (selectedEndTime.hour < startTime.value!.hour ||
+  //         (selectedEndTime.hour == startTime.value!.hour && selectedEndTime.minute <= startTime.value!.minute)) {
+  //       // Show error if end time is before start time
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text("End time cannot be before start time. Please select a valid end time.")),
+  //       );
+  //     } else {
+  //       // If the end time is valid, update the endTime Rx variable
+  //       endTime.value = selectedEndTime;
+  //       isValid = true;
+  //
+  //       // Optionally show snackbar confirmation
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text("End time selected: ${selectedEndTime.format(context)}")),
+  //       );
+  //     }
+  //   }
+  // }
 }
