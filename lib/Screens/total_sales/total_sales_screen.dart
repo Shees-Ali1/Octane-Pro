@@ -1,8 +1,11 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:octane_pro/CustomWidgets/custom_flChartDaily.dart';
 import 'package:octane_pro/GetxControllers/Sale-Controller/table_data_controller.dart';
 import 'package:octane_pro/Screens/total_sales/components/data_row.dart';
+import 'package:octane_pro/Screens/total_sales/components/total_container.dart';
 
 class TotalSalesScreen extends StatefulWidget {
   TotalSalesScreen({super.key});
@@ -191,33 +194,6 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
     });
   }
 
-  Widget _buildShiftButton(String shiftValue, String label) {
-    return GestureDetector(
-      onTap: () {
-        tableVM.time.value = "";
-        tableVM.shift.value = shiftValue;
-      },
-      child: Obx(() => Container(
-        margin: EdgeInsets.only(right: 12),
-        padding: EdgeInsets.symmetric(horizontal: 12),
-        height: 40,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: tableVM.shift.value == shiftValue ? Colors.red : Colors.black,
-          border: Border.all(width: 1, color: Colors.red),
-        ),
-        alignment: Alignment.center,
-        child: Text(label,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-            color: tableVM.shift.value == shiftValue ? Colors.white : Colors.red,
-            fontFamily: "Jost",
-          ),
-        ),
-      )),
-    );
-  }
   Widget _buildTimeButton(String shiftValue, String label) {
     return GestureDetector(
       onTap: () {
@@ -246,7 +222,6 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
     );
   }
 
-
   Widget _buildDialogButton(BuildContext context, String label, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -273,7 +248,6 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
   }
 
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -290,39 +264,129 @@ class _TotalSalesScreenState extends State<TotalSalesScreen> {
         ],
       ),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            _buildHeader(),
-            Expanded(
-              child: Obx(() {
-                return NotificationListener<ScrollNotification>(
-                  onNotification: (scrollInfo) {
-                    if (!tableVM.isLoading.value && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-                      tableVM.fetchSalesDataWithFilters();
-                    }
-                    return false;
-                  },
-                  child: ListView.builder(
-                    padding: EdgeInsets.zero,
-                    itemCount: tableVM.salesData.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index == tableVM.salesData.length) {
-                        return tableVM.isLoading.value
-                            ? Center(child: CircularProgressIndicator(color: Colors.red))
-                            : SizedBox.shrink();
-                      }
-                      final data = tableVM.salesData[index];
-                      List<Map<String, dynamic>> sales = List<Map<String, dynamic>>.from(data['expenses'].map((item) => Map<String, dynamic>.from(item)));
-                      return TableDataRow(data: sales, date: data['timestamp']);
-                    },
-                  ),
-                );
-              }),
+            Column(
+              children: [
+                // _buildTotalHeader(),
+                // SizedBox(height: 10,),
+                // Obx(
+                //     ()=> ListView.builder(
+                //       itemCount: tableVM.totalsByFuelType.length,
+                //       shrinkWrap: true,
+                //       padding: EdgeInsets.zero,
+                //       physics: NeverScrollableScrollPhysics(),
+                //       itemBuilder: (context, index){
+                //     return Padding(
+                //       padding:  EdgeInsets.only(bottom:index == 0 ? 8.0: 0, left: 10, right: 10),
+                //       child: Row(
+                //         children: [
+                //           SizedBox(
+                //             width: MediaQuery.of(context).size.width * 0.23,
+                //             child: Text(
+                //               tableVM.totalFilterData[index]['time'],
+                //               textAlign: TextAlign.center,
+                //               style: TextStyle(
+                //                 fontFamily: 'Jost',
+                //                 fontSize: 13,
+                //                 fontWeight: FontWeight.w500,
+                //                 color: Colors.white,
+                //               ),
+                //             ),
+                //           ),
+                //           SizedBox(
+                //             width: MediaQuery.of(context).size.width * 0.15,
+                //             child: Text(
+                //           tableVM.totalFilterData[index]['fuelType'],
+                //               textAlign: TextAlign.center,
+                //               style: TextStyle(
+                //                 fontFamily: 'Jost',
+                //                 fontSize: 13,
+                //                 fontWeight: FontWeight.w500,
+                //                 color: Colors.white,
+                //               ),
+                //             ),
+                //           ),
+                //           SizedBox(
+                //             width: MediaQuery.of(context).size.width * 0.27,
+                //             child: Text(
+                //               formatNumber(tableVM.totalFilterData[index]['totalLiters']),
+                //               textAlign: TextAlign.center,
+                //
+                //               style: TextStyle(
+                //                 fontFamily: 'Jost',
+                //                 fontSize: 13,
+                //                 fontWeight: FontWeight.w500,
+                //                 color: Colors.white,
+                //               ),
+                //             ),
+                //           ),
+                //           SizedBox(
+                //             width: MediaQuery.of(context).size.width * 0.29,
+                //             child: Text(
+                //               formatNumber(tableVM.totalFilterData[index]['totalAmount']),
+                //               textAlign: TextAlign.center,
+                //               style: TextStyle(
+                //                 fontFamily: 'Jost',
+                //                 fontSize: 13,
+                //                 fontWeight: FontWeight.w500,
+                //                 color: Colors.white,
+                //               ),
+                //             ),
+                //           ),
+                //         ],
+                //       ),
+                //     );
+                //   }),
+                // ),
+                _buildHeader(),
+                Expanded(
+                  child: Obx(() {
+                    return NotificationListener<ScrollNotification>(
+                      onNotification: (scrollInfo) {
+                        if (!tableVM.isLoading.value && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+                          tableVM.fetchSalesDataWithFilters();
+                        }
+                        return false;
+                      },
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        itemCount: tableVM.salesData.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == tableVM.salesData.length) {
+                            return tableVM.isLoading.value
+                                ? Center(child: CircularProgressIndicator(color: Colors.red))
+                                : SizedBox.shrink();
+                          }
+                          final data = tableVM.salesData[index];
+                          List<Map<String, dynamic>> sales = List<Map<String, dynamic>>.from(data['expenses'].map((item) => Map<String, dynamic>.from(item)));
+                          return TableDataRow(data: sales, date: data['timestamp']);
+                        },
+                      ),
+                    );
+                  }),
+                ),
+                SizedBox(height: 20,),
+              ],
             ),
-            SizedBox(height: 20,),
-            Container(),
+            Positioned(
+              bottom: 14,
+              child: SizedBox(
+              height: 130,
+              width: MediaQuery.of(context).size.width,
+              child: Obx(
+                  ()=> ListView.builder(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: tableVM.totalFilterData.length,
+                    itemBuilder: (context, index){
+                  return TotalContainer(data: tableVM.totalFilterData[index]);
+                }),
+              ),
+            ))
           ],
-        ),
+        )
       ),
     );
   }

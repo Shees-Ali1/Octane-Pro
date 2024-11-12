@@ -208,7 +208,7 @@ class _ListingScreenState extends State<ListingScreen> with TickerProviderStateM
 
                             return Container(
                               width: 327.w,
-                              height: 160.h,
+                              height: 162.h,
                               margin: const EdgeInsets.only(bottom: 10),
                               decoration: BoxDecoration(
                                 color: Color.fromRGBO(34, 34, 34, 1),

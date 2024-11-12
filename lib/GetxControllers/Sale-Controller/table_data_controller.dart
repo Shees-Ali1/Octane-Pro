@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
@@ -9,10 +10,20 @@ class TableDataController extends GetxController {
   var startTime = Rx<TimeOfDay?>(null);  // Initially null
   var endTime = Rx<TimeOfDay?>(null);    // Initially null
   RxList<QueryDocumentSnapshot> salesData = <QueryDocumentSnapshot>[].obs;
+  RxList<Map<String, dynamic>> totalFilterData = <Map<String, dynamic>>[].obs;
   RxBool isLoading = false.obs;
   RxBool hasMore = true.obs;
   QueryDocumentSnapshot? lastDocument;
   final int pageSize = 10;
+
+  var totalsByFuelType = <String, double>{}.obs;
+
+
+  var petrolData = <FlSpot>[].obs;
+  var dieselData = <FlSpot>[].obs;
+  var hobcData = <FlSpot>[].obs;
+
+  var fuels = <List<String>>[].obs;
 
   @override
   void onInit() {
@@ -35,12 +46,13 @@ class TableDataController extends GetxController {
     if (isLoading.value || !hasMore.value) return;
 
     isLoading.value = true;
+    Get.back();
     DateTime? startTimeFilter;
     DateTime? endTimeFilter;
     DateTime currentTime = DateTime.now();
 
     // Get the time filter value directly from the controller
-    String timeFilterValue = time.value;  // Access the value of RxString
+    String timeFilterValue = time.value;
 
     // Debug: Print the current time and the time filter value
     print("Current Time: $currentTime");
@@ -125,29 +137,6 @@ class TableDataController extends GetxController {
           isValidTime = strippedTimestamp.isAfter(strippedStartTimeFilter) && strippedTimestamp.isBefore(strippedEndTimeFilter);
         }
 
-        // Apply time-based filtering (based on day and time) if timeFilterValue is set
-        if (startTimeFilter != null && endTimeFilter == null) {
-          // Filter based on the `timeFilterValue` (12 hours, 24 hours, etc.)
-          DateTime timeFilterStart = startTimeFilter;
-
-          if (timeFilterValue == "12 hours") {
-            timeFilterStart = currentTime.subtract(Duration(hours: 12));
-          } else if (timeFilterValue == "24 hours") {
-            timeFilterStart = currentTime.subtract(Duration(hours: 24));
-          } else if (timeFilterValue == "Week") {
-            timeFilterStart = currentTime.subtract(Duration(days: 7));
-          } else if (timeFilterValue == "Month") {
-            timeFilterStart = currentTime.subtract(Duration(days: 30));
-          }
-
-          // Check if the document's timestamp is within the valid range
-          if (timestamp.isAfter(timeFilterStart)) {
-            isValidTime = true;
-          } else {
-            isValidTime = false;
-          }
-        }
-
         return isValidTime;
       }).toList();
 
@@ -158,6 +147,57 @@ class TableDataController extends GetxController {
       salesData.addAll(filteredData);
       salesData.refresh();
 
+      // Calculate totals by fuel type
+      totalsByFuelType.value = calculateTotalByFuelType();
+
+      // Prepare the result list
+
+      // Create fuel data list based on totalsByFuelType
+      // Create fuel data list based on totalsByFuelType
+      totalsByFuelType.forEach((fuelType, totalLiters) {
+        double totalAmount = 0.0;
+
+        // Calculate total amount for this fuel type
+        for (var document in filteredData) {
+          if (document['expenses'][0]['fuelType'] == fuelType) {
+            totalAmount += double.tryParse(document['expenses'][0]['amount']) ?? 0.0;
+          }
+        }
+
+        String timePeriod = timeFilterValue.isEmpty ? "Overall" : timeFilterValue;
+
+        if (startTimeFilter != null && endTimeFilter != null) {
+          timePeriod = "${startTimeFilter!.hour}:${startTimeFilter.minute} to ${endTimeFilter!.hour}:${endTimeFilter.minute}";
+        } else if (startTimeFilter != null) {
+          timePeriod = "${startTimeFilter!.hour}:${startTimeFilter.minute} to ${currentTime.hour}:${currentTime.minute}";
+        }
+
+        // Find the index of the entry for this fuelType in the list, if exists
+        int index = totalFilterData.indexWhere((entry) => entry['fuelType'] == fuelType);
+
+        // Create new entry for the current fuel type
+        Map<String, dynamic> newData = {
+          'fuelType': fuelType,
+          'totalLiters': totalLiters,
+          'totalAmount': totalAmount,
+          'time': timePeriod,
+        };
+
+        // If the fuelType is already in the list, replace the existing entry
+        if (index != -1) {
+          totalFilterData[index] = newData;  // Replace the existing entry
+        } else {
+          // If the fuelType is not in the list, add it
+          totalFilterData.add(newData);
+        }
+      });
+
+
+      // Print the fuel data list
+      print("Fuel Data List: $totalFilterData");
+
+      // You can use fuelDataList for your UI or further processing here
+
       // Update hasMore based on the size of the fetched documents
       if (snapshot.docs.length < pageSize) {
         hasMore.value = false;
@@ -167,8 +207,49 @@ class TableDataController extends GetxController {
     }
 
     isLoading.value = false;
-    Get.back();
   }
+
+  double calculateTotalAmount() {
+    double totalAmount = 0.0;
+
+    for (var document in salesData) {
+      totalAmount += double.tryParse(document['expenses'][0]['amount']) ?? 0.0;
+    }
+
+    return totalAmount;
+  }
+
+  double calculateTotalLiters() {
+    double totalLiters = 0.0;
+
+    for (var document in salesData) {
+      totalLiters += double.tryParse(document['expenses'][0]['liters']) ?? 0.0;
+    }
+
+    return totalLiters;
+  }
+
+  Map<String, double> calculateTotalByFuelType() {
+    Map<String, double> totalsByFuelType = {};
+
+    for (var document in salesData) {
+      String fuelType = document['expenses'][0]['fuelType'];
+      double liters = double.tryParse(document['expenses'][0]['liters']) ?? 0.0;
+
+
+      if (totalsByFuelType.containsKey(fuelType)) {
+        totalsByFuelType[fuelType] = (totalsByFuelType[fuelType] ?? 0.0) + liters;
+      } else {
+        totalsByFuelType[fuelType] = liters;
+      }
+
+    }
+
+    return totalsByFuelType;
+  }
+
+
+
 
   Future<TimeOfDay?> showTimeOnlyPicker({
     required BuildContext context,
